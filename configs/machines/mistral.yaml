@@ -61,7 +61,7 @@ module_actions:
         - "load autoconf/2.69"
         - "load nco"
         - "load cdo"
-        - "load gcc/7.1.0"
+        - "load gcc/4.8.2"
 
 export_vars:
         #########################################################################
@@ -162,21 +162,24 @@ export_vars:
         # MPI environent variables important at runtime
         I_MPI_FABRICS: shm:dapl
         I_MPI_FALLBACK: disable
-        I_MPI_SLURM_EXT: 1
-        I_MPI_LARGE_SCALE_THRESHOLD: 8192
+        I_MPI_SLURM_EXT: 0 # disable optimized startup algorithm for intel MPI
+        I_MPI_LARGE_SCALE_THRESHOLD: 8192 # set to a value larger than the number of MPI-tasks used !!!
         I_MPI_DYNAMIC_CONNECTION: 1
+        I_MPI_CHECK_DAPL_PROVIDER_COMPATIBILITY: 0
+        I_MPI_HARD_FINALIZE: 1
 
-        DAPL_NETWORK_NODES: $SLURM_NNODES
-        DAPL_NETWORK_PPN: $SLURM_NTASKS_PER_NODE
-        DAPL_WR_MAX: 500
+        # JS: The following 9 options were disabled to match the existing ksh env by Jan Hegewald
+        #DAPL_NETWORK_NODES: $SLURM_NNODES
+        #DAPL_NETWORK_PPN: $SLURM_NTASKS_PER_NODE
+        #DAPL_WR_MAX: 500
 
-        OMPI_MCA_pml: cm
-        OMPI_MCA_mtl: mxm
-        OMPI_MCA_coll: ^ghc
-        OMPI_MCA_mtl_mxm_np: 0
+        #OMPI_MCA_pml: cm
+        #OMPI_MCA_mtl: mxm
+        #OMPI_MCA_coll: ^ghc
+        #OMPI_MCA_mtl_mxm_np: 0
 
-        MXM_RDMA_PORTS: mlx5_0:1
-        MXM_LOG_LEVEL: FATAL
+        #MXM_RDMA_PORTS: mlx5_0:1
+        #MXM_LOG_LEVEL: FATAL
         ################################################
 
 choose_useMPI:
@@ -222,16 +225,18 @@ choose_useMPI:
                 add_module_actions:
                         - "load intel/18.0.4"
                         - "load openmpi/2.0.2p2_hpcx-intel14"
+                        - "load netcdf_c/4.3.2-gcc48"
                 add_export_vars:
-                        OMPI_MCA_pml: cm          # sets the point-to-point management layer
-                        OMPI_MCA_mtl: mxm         # sets the matching transport layer
-                        MXM_RDMA_PORTS: mlx5_0:1
-                        MXM_LOG_LEVEL: ERROR
-                        MXM_HANDLE_ERRORS: bt
-                        UCX_HANDLE_ERRORS: bt
-                        HDF5ROOT: /sw/rhel6-x64/hdf5/hdf5-1.8.18-parallel-openmpi-intel14/
-                        NETCDFFROOT: /sw/rhel6-x64/netcdf/netcdf_fortran-4.4.3-parallel-openmpi2-intel14/
-                        NETCDFROOT: /sw/rhel6-x64/netcdf/netcdf_c-4.4.0-parallel-openmpi2-intel14/
+                        # JS: The following 6 options were disabled to match the existing ksh env by Jan Hegewald
+                        #OMPI_MCA_pml: cm          # sets the point-to-point management layer
+                        #OMPI_MCA_mtl: mxm         # sets the matching transport layer
+                        #MXM_RDMA_PORTS: mlx5_0:1
+                        #MXM_LOG_LEVEL: ERROR
+                        #MXM_HANDLE_ERRORS: bt
+                        #UCX_HANDLE_ERRORS: bt
+                        HDF5ROOT: /sw/rhel6-x64/hdf5/hdf5-1.8.14-threadsafe-intel14/
+                        NETCDFFROOT: /sw/rhel6-x64/netcdf/netcdf_fortran-4.4.2-intel14/
+                        NETCDFROOT: /sw/rhel6-x64/netcdf/netcdf_c-4.3.2-intel14/
                         FC: mpif90
                         F77: mpif90
                         MPIFC: mpif90
