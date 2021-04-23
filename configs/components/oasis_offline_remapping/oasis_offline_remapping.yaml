@@ -1,10 +1,53 @@
 general:
         model: "oasis_offline_remapping"
-        coupled_setup: false
-        include_models: []
+        coupled_setup: true
+        include_models:
+                #- model1
+                #- model2
+                - oasis3mct
+
+model1:
+        model: model1
+        version: ""
+        executable: ""
+
+        coupling_fields:
+                FRECVANA:
+                        grid: A320
+
+        grids:
+                A320:
+                        name: A320
+                        nx: 321 # change this to the right variable ${nx}
+                        ny: 1
+                        oasis_grid_type: "U"
+                        number_of_overlapping_points: 0 # oasis P-value
+
+
+
+model2:
+        model: model2
+        version: ""
+        executable: ""
+
+        coupling_fields:
+                FSENDANA:
+                        grid: feom
+
+        grids:
+                feom:
+                        name: feom
+                        nx: 321 # change this to the right variable ${nx}
+                        ny: 1
+                        oasis_grid_type: "U"
+                        number_of_overlapping_points: 0 # oasis P-value
+
+
 
 oasis3mct:
         #crashed_awicm3_workdir: path to initial awicm3 work dir with model run up to rmp_* files get written with areas.nc, grids.nc, masks.nc
+
+
         input_sources:
             areas.nc: ${crashed_awicm3_workdir}/areas.nc
             grids.nc: ${crashed_awicm3_workdir}/grids.nc
@@ -15,7 +58,9 @@ oasis3mct:
         #mct_version: 4.0
         #norestart: "F"
 
-        process_ordering: []
+        process_ordering:
+                - model1
+                - model2
         #      - fesom
         #      - oifs
         #      - rnfmap
@@ -41,29 +86,33 @@ oasis3mct:
 
         coupling_time_step: 0
         coupling_target_fields:
-              rstas.nc:
-                      - 'heat_oce:heat_swo <--bicubic_glb-- A_Qns_oce:A_Qs_all'
-                      - 'prec_oce:snow_oce:evap_oce:subl_oce <--bicubic_glb-- A_Precip_liquid:A_Precip_solid:A_Evap:A_Subl'
-                      - 'heat_ico <--bicubic_gss-- A_Q_ice'
-                      - 'taux_oce:tauy_oce:taux_ico:tauy_ico <--bicubic-- A_TauX_oce:A_TauY_oce:A_TauX_ice:A_TauY_ice'
-                      - 'R_Runoff_atm <--bicubic-- A_Runoff'
-                      - 'hydr_oce <--gauswgt_c-- R_Runoff_oce'
-              rstos.nc:
-                      - 'A_SST:A_Ice_frac:A_Snow_thickness:A_Ice_temp:A_Ice_albedo <--gauswgt_i-- sst_feom:sie_feom:snt_feom:ist_feom:sia_feom'
+              rst.nc:
+                      - 'FRECVANA <--gauswgt-- FSENDANA'
+                      #- 'heat_oce:heat_swo <--bicubic_glb-- A_Qns_oce:A_Qs_all'
+                      #- 'prec_oce:snow_oce:evap_oce:subl_oce <--bicubic_glb-- A_Precip_liquid:A_Precip_solid:A_Evap:A_Subl'
+                      #- 'heat_ico <--bicubic_gss-- A_Q_ice'
+                      #- 'taux_oce:tauy_oce:taux_ico:tauy_ico <--bicubic-- A_TauX_oce:A_TauY_oce:A_TauX_ice:A_TauY_ice'
+                      #- 'R_Runoff_atm <--bicubic-- A_Runoff'
+                      #- 'hydr_oce <--gauswgt_c-- R_Runoff_oce'
+              #rstos.nc:
+              #        - 'A_SST:A_Ice_frac:A_Snow_thickness:A_Ice_temp:A_Ice_albedo <--gauswgt_i-- sst_feom:sie_feom:snt_feom:ist_feom:sia_feom'
 
         coupling_directions:
-              'atma->feom':
-                      lag: ${a2o_lag}
-                      seq: ${a2o_seq}
-              'atmr->rnfa':
-                      lag: ${r2a_lag}
-                      seq: ${r2a_seq}
-              'rnfo->feom':
-                      lag: ${o2r_lag}
-                      seq: ${o2r_seq}
-              'feom->atma':
-                      lag: ${o2a_lag}
-                      seq: ${o2a_seq}
+                'feom->A320':
+                        lag: ${a2o_lag}
+                        seq: ${a2o_seq}
+              #'atma->feom':
+              #        lag: ${a2o_lag}
+              #        seq: ${a2o_seq}
+              #'atmr->rnfa':
+              #        lag: ${r2a_lag}
+              #        seq: ${r2a_seq}
+              #'rnfo->feom':
+              #        lag: ${o2r_lag}
+              #        seq: ${o2r_seq}
+              #'feom->atma':
+              #        lag: ${o2a_lag}
+              #        seq: ${o2a_seq}
 
 
         coupling_methods:
@@ -94,6 +143,14 @@ oasis3mct:
                               conserv:
                                       method: gsspos
                                       algorithm: opt
+              gauswgt:
+                      time_transformation: average
+                      remapping:
+                              gauswgt:
+                                      search_bin: latitude
+                                      nb_of_search_bins: 1
+                                      nb_of_neighbours: 9
+                                      weight: "2.0"
               gauswgt_c:
                       time_transformation: conserv
                       remapping:
@@ -115,6 +172,19 @@ oasis3mct:
                                       nb_of_neighbours: 9
                                       weight: "2.0"
 
+        restart_in_files:
+                rst.nc: rst.nc
+        restart_in_sources:
+                rst.nc: rst.nc
+        restart_in_in_work:
+                rst.nc: rst.nc
+
+        restart_out_files:
+                rst.nc: rst.nc
+        restart_out_in_work:
+                rst.nc: rst.nc
+        restart_out_sources:
+                rst.nc: rst.nc
 
         #add_input_files:
         #      areas: areas
