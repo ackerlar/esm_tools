@@ -10,7 +10,7 @@ accounting: true
 #compiler_mpi: intel_2019a_impi2019
 #iolibraries: system_libs
 # for FOCI/FOCIOIFS use
-compiler_mpi: intel2020_psmpi2020
+compiler_mpi: intel2019_impi2019
 iolibraries: system_libs
 
 # slurm setup
@@ -88,17 +88,22 @@ export_vars:
 # choose compiler and MPI implementation
 choose_compiler_mpi:
 
-   intel2020_impi2020:
+   intel2019_impi2019:
       add_module_actions:
-        - "load Stages/2020"
-        - "load Intel/2020.2.254-GCC-9.3.0"
-        - "load IntelMPI/2019.8.254"
-        - "load CMake/3.18.0"
-        - "load Python/3.8.5"
-        - "load imkl/2020.2.254"
-        - "load netCDF-Fortran/4.5.3"
-        - "load netCDF/4.7.4"
-        - "load Perl/5.32.0"
+        - "load Stages/2019a"
+        - "load StdEnv"
+        - "load Intel/2019.3.199-GCC-8.3.0"
+        - "load IntelMPI/2018.5.288"
+        - "load imkl/2019.3.199"
+        - "load CMake"
+        - "load netCDF/4.6.3"
+        - "load netCDF-Fortran/4.4.5"
+        - "load parallel-netcdf/1.11.0"
+        - "load CDO"
+        - "load NCO"
+        - "load Python"
+        - "load Perl"
+        - "unload grib_api"
       add_export_vars:
         FC: mpiifort
         F77: mpiifort
@@ -110,7 +115,8 @@ choose_compiler_mpi:
         MPI_LIB: "\"$($FC -show |sed -e 's/^[^ ]*//' -e 's/-[I][^ ]*//g')\""
         NETCDF_Fortran_INCLUDE_DIRECTORIES: $EBROOTNETCDFMINFORTRAN/include
         NETCDF_Fortran_LIBRARIES: $EBROOTNETCDFMINFORTRAN/lib
-        ECCODESROOT: /p/project/chhb19/jstreffi/ecmwf/eccodes_intel2020_impi2020
+        #ECCODESROOT: /p/project/chhb19/jstreffi/ecmwf/eccodes_intel2019_impi2019
+        ECCODESROOT: /p/project/chhb19/jstreffi/ecmwf/gribapi_intelmpi_2019/
         LD_LIBRARY_PATH: $ECCODESROOT/lib64:$LD_LIBRARY_PATH
         PATH: /p/scratch/chhb19/hhb193/miniconda3/bin/:$PATH
 
@@ -223,10 +229,10 @@ choose_compiler_mpi:
 
 choose_iolibraries:
 
-    system_libs:
+    #system_libs:
        # TODO: find the correct libraries and dependencies
-       add_module_actions:
-         - "load netCDF"
+       #add_module_actions:
+       #  - "load netCDF"
     geomar_libs:
        choose_compiler_mpi:
           intel2019_impi2019:
