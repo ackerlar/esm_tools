@@ -16,6 +16,7 @@ def prepare_environment(config):
             "iter_coup_regrid_method_ice2oce": "INTERPOLATE",
             "fesom_use_icebergs": config["fesom"]["use_icebergs"],
             "ICEBERG_DIR": config["fesom"]["iceberg_dir"],
+            "MACHINE_NAME": config["computer"]["name"],
 
             #"FESOM_GRID_input": config["fesom"]["grid_input"],
             #"solidearth_ice_thickness_file":(

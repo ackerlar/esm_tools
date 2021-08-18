@@ -1,6 +1,6 @@
 general:
     setup_name: "awicm"
-    compute_time: "02:00:00"
+    compute_time: "00:15:00"
     initial_date: "1850-01-01"
     final_date: "2014-12-31"
     base_dir: "/work/ollie/lackerma/awicm_tests/"
@@ -34,7 +34,7 @@ awicm:
 fesom:
     version: "2.0"
     res: "CORE2"
-    pool_dir: "/work/ollie/pool/FESOM/fesom2.0/"
+    pool_dir: "/work/ollie/pool/FESOM/"
     # NOTE: This will be incorporated into the pool at a later stage
     mesh_dir: "/work/ollie/dsidoren/input/fesom2.0/meshes/mesh_CORE2_finaltopo_mean/"
     restart_rate: 1

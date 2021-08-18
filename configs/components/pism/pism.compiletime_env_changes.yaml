@@ -25,3 +25,4 @@ choose_computer.name:
                 - "PROJ4_ROOT=/sw/rhel6-x64/graphics/proj4-4.9.3-gcc48"
                 - "PETSC_DIR=/sw/rhel6-x64/numerics/PETSc-3.12.2-impi2018-intel18/"
                 - "HDF5_ROOT=$HDF5ROOT"
+                - "PROJ_ROOT=/global/AWIsoft/proj/5.1.0"

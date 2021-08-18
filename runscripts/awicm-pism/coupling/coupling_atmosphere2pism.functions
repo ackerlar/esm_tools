@@ -78,8 +78,8 @@ atmosphere2pism() {
     echo -e "\t\t=================================================================="
     echo -e "\t\t*** S T A R T I N G    atmosphere2pism *** "; echo
     
-    . /home/ollie/lackerma/esm-master/esm-runscripts/functions/all/general_lists.functions
-    . /home/ollie/lackerma/esm-master/esm-runscripts/functions/all/general_helpers.functions
+    . ${FUNCTION_PATH}/general_lists.functions
+    . ${FUNCTION_PATH}/general_helpers.functions
     . ${FUNCTION_PATH}/coupling_general.functions
 
     echo -e "\t\t---> Preparing to couple generic atmosphere to specific ice sheet model PISM"
@@ -686,7 +686,7 @@ ic_atm2pism_regrid_downscale_temperature() {
         if [ "x${DOWNSCALE_TEMP}" == "x1" ]; then
                 echo ""; echo "                *  downscaling temperature"
                 DOWNSCALING_LAPSE_RATE=${DOWNSCALING_LAPSE_RATE:-"-0.007"}
-                if (( ${DOWNSCALING_LAPSE_RATE} >= 0 )); then
+                if [ ${DOWNSCALING_LAPSE_RATE} -gt 0 ]; then
                         echo "YOUR DOWNSCALING LAPSE RATE IS POSITIVE!"
                         echo "IT WAS: $DOWNSCALING_LAPSE_RATE"
                         exit 6
@@ -1515,13 +1515,18 @@ ic_atm2debm_ablation_debm_run_execute_binary() {
                 fi
                 required_file_exit_code=$((required_file_exit_code + 1))
         done
-        module unload netcdf
-        module load netcdf/4.6.0_intel
+        
+        if [ "${MACHINE_NAME}" == "ollie" ]; then
+            module unload netcdf
+            module load netcdf/4.6.0_intel
+        fi
 
         ./$DEBM_BINARY > debm_stdout_stderr 2>&1 || cat debm_stdout_stderr
         
-        module unload netcdf/4.6.0_intel
-        module load netcdf/4.6.0_gnu
+        if [ "${MACHINE_NAME}" == "ollie" ]; then
+            module unload netcdf/4.6.0_intel
+            module load netcdf/4.6.0_gnu
+        fi
         cd -
 }
 
