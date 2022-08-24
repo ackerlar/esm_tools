@@ -254,16 +254,16 @@ def copy_files_to_thisrun(config):
 
 
 def update_icebergs(config):
-    six.print_("* starting update icebergs")
+    print("* starting update icebergs")
     if config["general"]["verbose"]:
-        six.print_("updateing icebergs")
+        print("updateing icebergs")
     if (
         config["fesom"].get("use_icebergs", False)
         and config["fesom"].get("update_icebergs", False)
         and config["general"]["run_number"] > 1
     ):
        
-        six.print_("LA DEBUG: update icebergs!")
+        print("LA DEBUG: update icebergs!")
         icb_script  = config["fesom"].get("icb_script", "")
         disch_file  = config["fesom"].get("disch_file", "")
         iceberg_dir = config["fesom"].get("iceberg_dir", config['general']['experiment_couple_dir'])
@@ -272,7 +272,7 @@ def update_icebergs(config):
         icb_restart_file  = config["fesom"]["restart_in_sources"].get("icb_restart", "")
         scaling_factor    = config["fesom"].get("scaling_factor", [1, 1, 1, 1, 1, 1])
 
-        six.print_("LA DEBUG: use scaling factors ", scaling_factor)
+        print("LA DEBUG: use scaling factors ", scaling_factor)
         ib = IcebergCalving(disch_file, mesh_dir, iceberg_dir, basin_file, icb_restart_file, scaling_factor=scaling_factor)
         ib.create_dataframe()
         ib._icb_generator()

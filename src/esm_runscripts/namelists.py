@@ -492,8 +492,6 @@ class Namelist:
                 else:
                     print("Something went wrong! Continue without old icebergs.")
                     ib_num_old = 0
-            else:
-                ib_num_old = 0
 
                 print(" * iceberg_dir = ", config["fesom"].get("iceberg_dir"))
                 ib_num_new = sum(1 for line in open(config["fesom"]["input_sources"].get("length")))
