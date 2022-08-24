@@ -495,10 +495,10 @@ class Namelist:
             else:
                 ib_num_old = 0
 
-            print(" * iceberg_dir = ", config["fesom"].get("iceberg_dir"))
-            ib_num_new = sum(1 for line in open(config["fesom"].get("iceberg_dir") + "/LON.dat"))
-            icebergs["ib_num"] = ib_num_old + ib_num_new
-            nml["icebergs"] = icebergs
+                print(" * iceberg_dir = ", config["fesom"].get("iceberg_dir"))
+                ib_num_new = sum(1 for line in open(config["fesom"]["input_sources"].get("length")))
+                icebergs["ib_num"] = ib_num_old + ib_num_new
+                nml["icebergs"] = icebergs
         return config
 
 

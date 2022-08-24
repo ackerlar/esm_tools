@@ -117,6 +117,25 @@ disturbance: "1.000001"
 lresume: false
 dataset: "r0007"
 
+lgfw: False
+lupdate_orography: False
+choose_general.iterative_coupling:
+        True:
+                lgfw: True
+                choose_general.chunk_number:
+                        1:
+                                lgfw: False
+                                lupdate_orography: False
+                        "*":
+                                choose_general.first_run_in_chunk:
+                                        True:
+                                                lupdate_orography: True
+                                        "*":
+                                                lupdate_orography: False
+                hosing_correction: True
+        '*':
+                hosing_correction: False
+
 ini_parent_date: 22941231
 ini_parent_exp_id: khw0030
 ini_parent_dir: "${pool_dir}/MPIESM/restart/dev/${parent_expid}/restart/echam6"
@@ -551,6 +570,10 @@ input_in_work:
 forcing_in_work:
         sic: "unit.96"
         sst: "unit.20"
+        # deniz: TODO: write comment
+        aerocoarse_kinne_1850: "aero_coarse_@YEAR@.nc"
+        aerofarir_kinne_1850: "aero_farir_@YEAR@.nc"
+        aerofin_kinne_1850: "aero_fine_@YEAR@.nc"
         # ok this is another crazy ECHAM6 speciality
         # every year the background aerosol files for 1849 to 1851 
         # need to be linked to the same file for historical/scenario runs
@@ -626,6 +649,7 @@ streams:
         - sp6h
         - glim
         - spim
+        - ism
 
 streamsnc:
         - aclcim
@@ -747,6 +771,9 @@ namelist_changes:
                 parctl:
                         nproca: "${nproca}"
                         nprocb: "${nprocb}"
+                submodelctl:
+                        lgfw: "${lgfw}"
+                        lupdate_orog: "${lupdate_orography}"
 
 wiso_fields: [o18w_atm, hdow_atm, o16w_atm, o18i_atm, hdoi_atm, o16i_atm, w1_atm, w2_atm, w3_atm, i1_atm, i2_atm, i3_atm]
 
@@ -797,6 +824,24 @@ grids:
                 ny: "${_ny}"
                 oasis_grid_type: "D"
                 number_of_overlapping_points: 0 # oasis P-value
+
+choose_lgfw:
+        True:
+                add_input_sources:
+                        gfw_atmo: "${general.experiment_couple_dir}/latest_gfw_atmo.nc"
+                add_input_files:
+                        gfw_atmo: gfw_atmo
+                add_input_in_work:
+                        gfw_atmo: "gfw_atmo.nc"
+
+choose_lupdate_orography:
+        True:
+                add_input_sources:
+                        target_oro: "${general.experiment_couple_dir}/latest_target_orography.nc"
+                add_input_files:
+                        target_oro: target_oro
+                add_input_in_work:
+                        target_oro: "target_orography_echam6.nc"
 
 # Configuration Files:
 config_sources:
