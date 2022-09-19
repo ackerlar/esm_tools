@@ -1,10 +1,11 @@
 general:
     setup_name: "awiesm"
-    account: ba0989
+    #account: ba0989
     compute_time: "00:55:00"
     initial_date: "1938-01-01"
     final_date: "2037-12-31"
-    base_dir: "/work/ba0989/a270124/PalModII/experiments/"
+    base_dir: "/work/ollie/lackerma/PalModII/experiments"
+    restartdir:  "/work/ollie/lackerma/PalModII/experiments/125ka_generate_forcing/restart/"
     nmonth: 0
     nyear: 1
     files_to_wait_for:
@@ -17,14 +18,17 @@ general:
     #clean_old_rundirs_keep_every: 5
     #clean_old_rundirs_except: 2
 
+computer:
+    additional_flags: "--qos=express"
+
 awiesm:
     version: "2.1"
     postprocessing: true
     scenario: "PALEO"
-    model_dir: "/home/a/a270124/awiesm-2.1"
+    model_dir: "/work/ollie/lackerma/egu_2021/model_codes/awiesm-2.1/"
 
 echam:
-    version: "6.3.05p2-concurrent_radiation-paleodyn"
+    version: "6.3.05p2"
     restart_unit: "years"
     nproca: 24 
     nprocb: 24 # this alone has no effect, nprocb still set to 24 in namelist.echam
@@ -34,11 +38,11 @@ echam:
     lresume: 1
     use_transient_forcing: false
     #transient_forcing_table: "/work/ollie/lackerma/PalModII/125-110ka_echam_forcing.tab" 
-    hosing_correction: true
     disturbance: 1.00001
-    ini_parent_dir: "/work/ba0989/a270124/PalModII/experiments/PI_bootstrap/restart/echam/"
-    ini_parent_exp_id: "PI_bootstrap"
-    ini_parent_date: "19371231"
+    ini_parent_dir: "${general.restartdir}/echam/"
+    ini_parent_exp_id: "125ka_generate_forcing"
+    hosing_correction: true
+    ini_parent_date: "13101231"
     add_namelist_changes:
         namelist.echam:
             #dynctl:
@@ -77,7 +81,7 @@ echam:
                     nproc: 1
                     run_before: prepcompute
                     script: coupling_dual-ice2echam.functions
-                    script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                    script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                     call_function: ice2echam
                     env_preparation: env_echam.py
                     run_only: first_run_in_chunk
@@ -87,51 +91,51 @@ echam:
                     nproc: 1
                     run_after: tidy
                     script: coupling_echam2ice.functions
-                    script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                    script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                     call_function: echam2ice
                     env_preparation: env_echam.py
                     run_only: last_run_in_chunk
 
 jsbach:
     add_input_sources:
-        jsbach_1850: "/work/ba0989/a270124/PalModII/experiments//PI_bootstrap/couple//jsbach_init_file_1938-01-01T00:00:00-1942-12-31T00:00:00.nc"
+        jsbach_1850: "/work/ollie/lackerma/PalModII/experiments/125ka_AWIESM-2.2/couple/latest_jsbach_init_file.nc"
     lresume: 1
-    ini_parent_exp_id: "PI_bootstrap"
-    ini_parent_date: "19371231"
-    ini_parent_dir: "/work/ba0989/a270124/PalModII/experiments/PI_bootstrap/restart/jsbach/"
+    ini_parent_exp_id: "125ka_generate_forcing"
+    ini_parent_date: "13101231"
+    ini_parent_dir: "${general.restartdir}/jsbach/"
 
 hdmodel:
     lresume: 1
-    ini_parent_exp_id: "PI_bootstrap"
-    ini_parent_date: "19371231"
-    ini_parent_dir: "/work/ba0989/a270124/PalModII/experiments/PI_bootstrap/restart/hdmodel/"
+    ini_parent_exp_id: "125ka_generate_forcing"
+    ini_parent_date: "13101231"
+    ini_parent_dir: "${general.restartdir}/hdmodel/"
 
 oasis3mct:
     lresume: 1
-    ini_parent_exp_id: "PI_bootstrap"
-    ini_parent_date: "19371231"
-    ini_parent_dir: "/work/ba0989/a270124/PalModII/experiments/PI_bootstrap/restart/oasis3mct/"
+    ini_parent_exp_id: "125ka_generate_forcing"
+    ini_parent_date: "13101231"
+    ini_parent_dir: "${general.restartdir}/oasis3mct/"
 
 fesom:
     version: "2.0"
     res: "CORE2"
     pool_dir: "/pool/data/AWICM/FESOM2"
-    mesh_dir: "/pf/a/a270064/bb1029/AWIESM2.1-EXP/mesh_core2/"
-    namelist_dir: "/work/ba0989/a270124/PalModII/experiments/work_RC12_wiso/"
+    mesh_dir: "/work/ollie/lackerma/PalModII/mesh_core2/"
+    namelist_dir: "/work/ollie/lackerma/PalModII/namelists/work_RC12_wiso/"
     restart_rate: 1
     restart_unit: "y"
     restart_first: 1
     lresume: 1
-    ini_parent_exp_id: "PI_bootstrap"
-    ini_parent_date: "19371231"
-    ini_parent_dir: "/work/ba0989/a270124/PalModII/experiments/PI_bootstrap/restart/fesom/"
+    ini_parent_dir: "${general.restartdir}/fesom/"
+    ini_parent_exp_id: "125ka_generate_forcing"
+    ini_parent_date: "13101231"
     use_icebergs: False
     iceberg_dir: ""
     #do_hosing:  True
     add_namelist_changes:
         namelist.config:
             paths:
-                ClimateDataPath: "/pf/a/a270064/work/AWIESM2.1-EXP/hydrography/"
+                ClimateDataPath: "/work/ollie/lackerma/egu_2021/nonstandard_pool_files/fesom/hydrography/"
                 ForcingDataPath: remove_from_namelist
                 OpbndPath: remove_from_namelist
                 TideForcingPath: remove_from_namelist
@@ -147,7 +151,7 @@ fesom:
                     nproc: 1
                     run_before: prepcompute
                     script: coupling_ice2fesom.functions
-                    script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                    script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                     call_function: ice2fesom
                     env_preparation: env_fesom.py
                     run_only: first_run_in_chunk
@@ -157,7 +161,7 @@ fesom:
                     nproc: 1
                     run_after: tidy
                     script: coupling_fesom2ice.functions
-                    script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                    script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                     call_function: fesom2ice
                     env_preparation: env_fesom.py
                     run_only: last_run_in_chunk

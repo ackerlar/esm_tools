@@ -14,14 +14,14 @@ general:
 pism_sh:
         version: "github1.2.1"
         resolution: "16km"
-        model_dir: "/pf/a/a270124/pism_v1.2.1/"
+        model_dir: "/home/ollie/lackerma/MODELS/pism-github1.2.1/"
         lresume: 1
 
         ###################
         # Settings for AWIES - PISM coupling
         # DEBM
         ablation_method: "DEBM"
-        debm_path: "/pf/a/a270129/dEBM_esm_tools/dEBMmain"
+        debm_path: "/work/ollie/sxu/esm-experiments/AWICM2_PISM/115ka_piIce_DEBM/couple/dEBMmain"
         debm_obl: "22.944859"
         # lapse rate
         lapse_rate: -0.005
@@ -31,8 +31,8 @@ pism_sh:
         ini_parent_exp_id: "bla"
         ini_parent_date: "1-1-1"
         ini_restart_dir: "bla"
-        spinup_file: "/work/ba0989/a270124/esm-experiments/icebergs/antarctic/restarts_lennert/pismr_antarctica_16km.spinup_start.nc"
-        pool_dir: "/work/ba1066/a270124/pool_pism/"
+        spinup_file: "/work/ollie/lackerma/PalModII/experiments/spinup_pism01/restart/pism/spinup_pism01_pismr_restart_399900101-399991231.nc"
+        pool_dir: "/home/ollie/lackerma/pool_pism/"
         ts_interval: "1"
         ex_interval: "monthly"
         domain: "antarctica"
@@ -56,7 +56,7 @@ pism_sh:
                                 run_before: prepcompute
                                 #script: pseudo_couple_in_pism.sh
                                 script: coupling_awiesm2pism.functions
-                                script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                                script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                                 #call_function: call_this
                                 call_function: awiesm2pism
                                 env_preparation: env_pism.py
@@ -68,7 +68,7 @@ pism_sh:
                                 run_after: tidy
                                 #script: pseudo_couple_out_pism.sh
                                 script: coupling_awiesm2pism.functions
-                                script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                                script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                                 #call_function: call_this
                                 call_function: pism2awiesm
                                 env_preparation: env_pism2awiesm.py

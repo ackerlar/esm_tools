@@ -1,0 +1,90 @@
+module purge
+# make the contents as shell agnostic as possible so we can include them with bash, zsh and others
+module load pism_externals
+#module unload python && module load python3
+
+module load cmake
+module load udunits
+
+module unload intel.compiler intel.mpi && module load intel.compiler intel.mpi 
+module unload netcdf
+module load hdf5
+module load centoslibs cdo nco netcdf/4.6.0_intel #netcdf/4.6.0_gnu
+
+export HDF5ROOT=$HDF5_ROOT
+
+export PATH=/work/ollie/jhegewal/sw/cmake/bin:$PATH
+
+export FC="mpiifort -mkl" CC=mpiicc CXX=mpiicpc
+
+export ZLIBROOT=/usr
+		
+export MPIROOT=${I_MPI_ROOT}/intel64
+export MPIFC='mpiifort'
+export MPICC='mpiicc'
+
+export NETCDFFROOT=${NETCDF_DIR}
+export NETCDFROOT=${NETCDF_DIR}
+export NETCDF_Fortran_INCLUDE_DIRECTORIES=${NETCDF_DIR}/include
+export NETCDF_CXX_INCLUDE_DIRECTORIES=${NETCDF_DIR}/include
+export NETCDF_CXX_LIBRARIES=${NETCDF_DIR}/lib
+
+echo $NETCDF_CXX_INCLUDE_DIRECTORIES
+echo "==================================="
+echo $NETCDF_CXX_LIBRARIES
+
+
+export LAPACK_LIB='-lmkl_intel_lp64 -lmkl_core -mkl=sequential -lpthread -lm -ldl'
+
+export CC='mpiicc'
+export CXX='mpiicpc'
+#export FC='mpiifort'
+export F77='mpiifort'
+
+
+#######################
+# IceBerg environment #
+#######################
+#
+#export ICEBERG_MPI_LIB="/global/AWIsoft/intel/2018/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential"
+#export ICEBERG_FFLAGS="-r8 -fp-model precise -O3 -g -traceback -qopt-report=0"
+#export ICEBERG_OASIS_BASE=$pwd/../oasis
+#export ICEBERG_OASIS_LIB="-L$ICEBERG_OASIS_BASE/build/lib/psmile -lpsmile -lmct -lmpeu -lscrip"
+#export ICEBERG_OASIS_INCLUDE=-I$ICEBERG_OASIS_BASE/build/lib/psmile
+
+######################
+# OpenIFS environment #
+######################
+#
+#export PERL5LIB="/usr/lib64/perl5"
+#export PATH=$PATH:/home/ollie/jstreffi/fcm/bin/
+#
+#export OIFS_GRIB_INCLUDE=-I/home/ollie/jstreffi/ecmwf/grib_api/include
+#export OIFS_GRIB_LIB="-L/home/ollie/jstreffi/ecmwf/grib_api/lib -lgrib_api_f90 -lgrib_api" 
+#export OIFS_GRIB_BIN="/home/ollie/jstreffi/ecmwf/grib_api/bin"
+#
+#export LAPACK_LIB_DEFAULT="-L/global/AWIsoft/intel/2018/compilers_and_libraries_2018.5.274/linux/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential"
+#
+#pwd=`pwd`
+#export OIFS_OASIS_BASE=$pwd/../oasis
+#export OIFS_OASIS_INCLUDE=-I$OIFS_OASIS_BASE/build/lib/psmile
+#export OIFS_OASIS_LIB="-L$OIFS_OASIS_BASE/build/lib/psmile -lpsmile -lmct -lmpeu -lscrip"
+#
+#export OIFS_NETCDF_LIB="-L${NETCDF_DIR}/lib -lnetcdf"
+#export OIFS_NETCDF_INCLUDE=-I${NETCDF_DIR}/include
+#export OIFS_NETCDFF_LIB="-L${NETCDF_DIR}/lib -lnetcdff"
+#export OIFS_NETCDFF_INCLUDE=-I${NETCDF_DIR}/include
+#
+#export OIFS_FC=$FC
+##export OIFS_FFLAGS="-r8 -fp-model precise -align array32byte -O0 -xCORE_AVX2 -g -traceback -convert big_endian -check all,noarg_temp_created -fpe0 -init=zero"
+##export OIFS_FFLAGS="-r8 -fp-model precise -align array32byte -O0 -xCORE_AVX2 -g -traceback -convert big_endian -check all,noarg_temp_created,bounds -fpe0"
+#export OIFS_FFLAGS="-r8 -fp-model precise -align array32byte -O3 -xCORE_AVX2 -g -traceback -convert big_endian"
+#export OIFS_FFIXED=""
+#export OIFS_FCDEFS="BLAS LITTLE LINUX INTEGER_IS_INT"
+#export OIFS_LFLAGS=$OIFS_MPI_LIB
+
+export OIFS_CC=$CC
+export OIFS_CFLAGS="-fp-model precise -O3 -xCORE_AVX2 -g -traceback -qopt-report=0"
+export OIFS_CCDEFS="LINUX LITTLE INTEGER_IS_INT _ABI64 BLAS"
+
+

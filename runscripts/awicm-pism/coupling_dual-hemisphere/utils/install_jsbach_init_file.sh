@@ -1,10 +1,15 @@
 #!/bin/bash -l
 
-module load gcc/11.2.0-gcc-11.2.0 #gcc/6.4.0
-fortran_compiler=gfortran
-nc_config=/sw/spack-levante.2022-02-17/netcdf-fortran-4.5.3-jlxcfz/bin/nf-config #/sw/rhel6-x64/netcdf/netcdf_fortran-4.4.4-gcc64/bin/nf-config
-NETCDF_LIB=$($nc_config --flibs)
-NETCDF_INCLUDE=-I$($nc_config --includedir)
+. ollie.awi.de
+fortran_compiler=ifort
+NETCDF_LIB="$(nc-config --libs) -l netcdff"
+NETCDF_INCLUDE=-I$(nc-config --includedir)
+
+#module load gcc/11.2.0-gcc-11.2.0 #gcc/6.4.0
+#fortran_compiler=gfortran
+#nc_config=/sw/spack-levante.2022-02-17/netcdf-fortran-4.5.3-jlxcfz/bin/nf-config #/sw/rhel6-x64/netcdf/netcdf_fortran-4.4.4-gcc64/bin/nf-config
+#NETCDF_LIB=$($nc_config --flibs)
+#NETCDF_INCLUDE=-I$($nc_config --includedir)
 
 echo "Done loading environment!"
 

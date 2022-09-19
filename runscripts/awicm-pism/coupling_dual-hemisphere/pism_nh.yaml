@@ -3,7 +3,7 @@ general:
         compute_time: "00:40:00"
         initial_date: "8100-01-01"
         final_date: "8200-12-31"
-        base_dir: "/work/ba0989/a270124/PalModII/experiments/"
+        base_dir: "/work/ollie/lackerma/PalModII/experiments/"
         nyear: 10
         #clean_old_rundirs_keep_every: 5
         #clean_old_rundirs_except: 2
@@ -15,14 +15,14 @@ general:
 pism_nh:
         version: "github1.2.1"
         resolution: "10km"
-        model_dir: "/pf/a/a270124/pism_v1.2.1/"
+        model_dir: "/home/ollie/lackerma/MODELS/pism-github1.2.1/"
         lresume: 1
 
         ###################
         # Settings for AWIES - PISM coupling
         # DEBM
         ablation_method: "DEBM"
-        debm_path: "/pf/a/a270129/dEBM_esm_tools/dEBMmain"
+        debm_path: "/work/ollie/sxu/esm-experiments/AWICM2_PISM/115ka_piIce_DEBM/couple/dEBMmain"
         debm_obl: "22.944859"
         # lapse rate
         lapse_rate: -0.005
@@ -33,8 +33,8 @@ pism_nh:
         ini_parent_exp_id: "bla"
         ini_parent_date: "1-1-1"
         ini_restart_dir: "bla"
-        spinup_file: "/work/ba0989/a270124/PalModII/experiments/PI_spinup_q01/restart/pism/PI_spinup_q01_pismr_restart_80900101-80991231.nc"
-        pool_dir: "/work/ba1066/a270124/pool_pism/"
+        spinup_file: "/work/ollie/lackerma/PalModII/experiments/spinup_pism01/restart/pism/spinup_pism01_pismr_restart_399900101-399991231.nc"
+        pool_dir: "/home/ollie/lackerma/pool_pism/"
         ts_interval: "1"
         ex_interval: "monthly"
         domain: "nhem"
@@ -55,7 +55,7 @@ pism_nh:
                 bed_deformation.model: "lc"
                 calving.methods: 'eigen_calving,thickness_calving'
                 calving.thickness_calving.threshold: 200
-                geometry.front_retreat.prescribed.file: "/work/ba1066/a270124/pool_pism/masks/nhem/pismr_nhem_10km_no-tibet_mask.nc"
+                geometry.front_retreat.prescribed.file: "/home/ollie/lackerma/pool_pism/masks/nhem/pismr_nhem_10km_no-tibet_mask.nc"
                 ocean.pik_melt_factor: "1e-2"
                 atmosphere.elevation_change.precip_lapse_rate: 0.0
                 atmosphere.elevation_change.smb_lapse_rate: 0.0
@@ -86,7 +86,7 @@ pism_nh:
                                 nproc: 1
                                 run_before: prepcompute
                                 script: coupling_awiesm2pism.functions
-                                script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                                script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                                 call_function: awiesm2pism
                                 env_preparation: env_pism.py
                                 run_only: first_run_in_chunk
@@ -96,7 +96,7 @@ pism_nh:
                                 nproc: 1
                                 run_after: tidy
                                 script: coupling_pism2awiesm.functions
-                                script_dir: /home/a/a270124/esm_tools/runscripts/awicm-pism/coupling/
+                                script_dir: /home/ollie/lackerma/SOFTWARE/esm-tools/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere/
                                 call_function: pism2awiesm
                                 env_preparation: env_pism2awiesm.py
                                 run_only: last_run_in_chunk

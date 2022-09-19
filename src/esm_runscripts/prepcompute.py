@@ -4,13 +4,13 @@ import shutil
 import subprocess
 import copy
 
-######################################
-# LA for icebergs
-from cdo import Cdo
-import glob
-import pandas as pd
-from .icb_apply_distribution_functions import *
-######################################
+#######################################
+## LA for icebergs
+#from cdo import Cdo
+#import glob
+#import pandas as pd
+#from .icb_apply_distribution_functions import *
+#######################################
 
 import f90nml
 import six
