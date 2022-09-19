@@ -11,7 +11,7 @@ choose_computer.name:
                 - "unload netcdf"
                 - "unload intel.compiler"
                 - "unload intel.mpi"
-                - "use ~dbarbi/modulefiles"
+                - "use /home/ollie/lackerma/modules_from_dirk"
                 - "unload hdf5"
                 - "load pism_externals"
             add_export_vars:
