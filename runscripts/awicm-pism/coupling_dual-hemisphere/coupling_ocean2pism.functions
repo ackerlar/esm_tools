@@ -30,7 +30,7 @@ function ocean2pism {
     PISM_OCEAN_FILE_SWITCH=""
 
     iter_coup_regrid_method_oce2ice=${iter_coup_regrid_method_oce2ice:-EXTRAPOLATE}
-    iter_coup_interact_method_oce2ice=${iter_coup_interact_method_oce2ice:-OCEANTEMPSALT}
+    iter_coup_interact_method_oce2ice=${iter_coup_interact_method_oce2ice:-OCEANTEMPSALT} #CCR
 
     read_names ocean ice
     save_griddes ice
