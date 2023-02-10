@@ -1476,23 +1476,23 @@ ic_atm2debm_ablation_debm_make_forcing_merge_preliminary_files() {
 
 
 ## @fn ic_atm2pism_set_options_surface_given
-### @brief
-### Sets surface given options for the next PISM run
-#ic_debm2pism_ablation_debm_set_options_surface_given() {
-#        pism_conf_file_list="${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_coupler_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_forcing_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_config_value_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat"
-#        for pism_conf_file in $pism_conf_file_list; do
-#                if [ ! -f $pism_conf_file ]; then
-#                        :> $pism_conf_file
-#                fi
-#        done
-#
-#        echo "pism_set_coupler___surface=given" >> \
-#                ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_coupler_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat
-#        echo "pism_set_forcing_file___surface_given=${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc" >> \
-#                ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_forcing_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat
-#        echo "pism_set_config_value_FORCE___surface_given_period=$(cdo -s nyear ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc)" \
-#                >> ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_forcing_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat
-#}
+## @brief
+## Sets surface given options for the next PISM run
+ic_debm2pism_ablation_debm_set_options_surface_given() {
+        pism_conf_file_list="${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_coupler_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_forcing_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_config_value_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat"
+        for pism_conf_file in $pism_conf_file_list; do
+                if [ ! -f $pism_conf_file ]; then
+                        :> $pism_conf_file
+                fi
+        done
+
+        echo "pism_set_coupler___surface=given" >> \
+                ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_coupler_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat
+        echo "pism_set_forcing_file___surface_given=${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc" >> \
+                ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_forcing_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat
+        echo "pism_set_config_value_FORCE___surface_given_period=$(cdo -s nyear ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc)" \
+                >> ${COUPLE_DIR}/${PISM_HEMISPHERE}/pism_forcing_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.dat
+}
 
 
 ic_atm2debm_ablation_debm_run_modify_nml() {
