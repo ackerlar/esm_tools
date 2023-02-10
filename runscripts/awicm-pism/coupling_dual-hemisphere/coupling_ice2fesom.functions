@@ -228,8 +228,9 @@ function iterative_coupling_pism_ocean_prepare_ocean_icebergmodel_forcing {
     echo "PISM_DISCHARGE_FILE: ${pism_discharge_file}"
 
     cdo -s -timmean -selname,tendency_of_ice_amount_due_to_discharge \
-            -setgrid,${COUPLE_DIR}/ice.griddes ${pism_discharge_file} ${COUPLE_DIR}/latest_discharge.nc
-    
+        -setgrid,${COUPLE_DIR}/ice.griddes ${pism_discharge_file} ${COUPLE_DIR}/latest_discharge.nc
+    #TODO: -setgrid,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes ${pism_discharge_file} ${COUPLE_DIR}/${PISM_HEMISPHERE}/latest_discharge.nc
+
     module unload python
     if [ "$MACHINE" == "ollie" ]; then
         module load python3/3.7.7_intel2020u2
@@ -246,8 +247,10 @@ function iterative_coupling_pism_ocean_prepare_ocean_icebergmodel_forcing {
             cp ${MESH_DIR_fesom}/elem2d.out ${COUPLE_DIR}/elem2d.out
         fi
         python ${FUNCTION_PATH}/utils/icb_apply_distribution.py ${COUPLE_DIR}/latest_discharge.nc ${COUPLE_DIR} ${COUPLE_DIR} ${BASIN_FILE}
+	#TODO:python ${FUNCTION_PATH}/utils/icb_apply_distribution.py ${COUPLE_DIR}/${PISM_HEMISPHERE}/latest_discharge.nc ${COUPLE_DIR} ${COUPLE_DIR} ${BASIN_FILE}
     else
         python ${FUNCTION_PATH}/utils/icb_apply_distribution.py ${COUPLE_DIR}/latest_discharge.nc ${MESH_DIR_fesom} ${COUPLE_DIR} ${BASIN_FILE}
+	#TODO:python ${FUNCTION_PATH}/utils/icb_apply_distribution.py ${COUPLE_DIR}/${PISM_HEMISPHERE}/latest_discharge.nc ${MESH_DIR_fesom} ${COUPLE_DIR} ${BASIN_FILE}
     fi
 
     echo; echo "    * Finished iceberg generation"
