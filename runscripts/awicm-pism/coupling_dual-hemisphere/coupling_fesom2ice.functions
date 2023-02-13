@@ -10,7 +10,12 @@ function fesom2ice {
     fi
 
     module load python3
-    module load cdo
+    if [ $( type -qp cdo) ] ; then
+        echo "Use existing 'cdo'"
+    else
+        echo "Load 'cdo' module"
+        module load cdo
+    fi
 
     . ${FUNCTION_PATH}/general_lists.functions
     . ${FUNCTION_PATH}/coupling_general.functions
