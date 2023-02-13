@@ -225,7 +225,10 @@ function generate_orography_anomaly_over_pism_run {
                 $ifile \
                 $ofile 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_pism2atm
 
-        ncks -O -x -v time,GEOSP $ofile tmp.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_pism2atm
+	ncks -O -x -v GEOSP $ofile tmp.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_pism2atm
+        # Time is taken if GEOSP follows the 'time' dimension
+        #**# ncks -O -x -v time,GEOSP $ofile tmp.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_pism2atm
+	#**# ncks: ERROR nco_xtr_xcl_chk() reports explicitly excluding (with -x or synonyms --xcl, --exclude) the variable "time" from the output fails because "time" is a coordinate, auxiliary coordinate, and/or CF-defined (Climate & Forecast Metadata Conventions) variable associated with or ancillary to at least one other variable that would be output.
         mv tmp.nc $ofile
 }
 
