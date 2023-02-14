@@ -1160,6 +1160,7 @@ regrid_to_echam() {
 	if [[ "x$remapper" == "x" ]]; then
 	    #:org: remapper=remapcon2
 	    remapper=remapbil
+	    remapper=remapdis
 	fi
 	echo "                -   regridding $FILENAME to echam ${RES_echam} grid with $remapper"
         cdo -s -P 28 \
