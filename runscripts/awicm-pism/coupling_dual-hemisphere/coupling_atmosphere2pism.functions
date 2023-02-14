@@ -87,7 +87,7 @@ atmosphere2pism() {
         module load hdf5/1.10.2_gnu
         module load netcdf/4.6.2_gnu
     fi
-    if [ $( type -qp cdo) ] ; then
+    if [ $(type -p cdo) ] ; then
         echo "Use existing 'cdo'"
     else
         echo "Load 'cdo' module"

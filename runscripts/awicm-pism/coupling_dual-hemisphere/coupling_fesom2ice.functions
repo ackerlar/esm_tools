@@ -10,7 +10,7 @@ function fesom2ice {
     fi
 
     module load python3
-    if [ $( type -qp cdo) ] ; then
+    if [ $(type -p cdo) ] ; then
         echo "Use existing 'cdo'"
     else
         echo "Load 'cdo' module"
