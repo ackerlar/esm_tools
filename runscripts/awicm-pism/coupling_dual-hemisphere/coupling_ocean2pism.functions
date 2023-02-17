@@ -182,6 +182,25 @@ function ocean2pism {
             exit 3
     esac
 
+
+    #
+    # Here ANOMALY in ocean-temperature and salinity
+    #
+    if [ "x${ANOMALY_OCEAN_TEMPERATURE:-0}" == "x1" || \
+             "x${ANOMALY_OCEAN_SALINITY:-0}" == "x1" ]
+    then
+	# Initialize require variables and file names
+	ic_oce2pism_anoforce_initialize
+
+	if [ "x${ANOMALY_OCEAN_TEMPERATURE:-0}" == "x1" ] ; then
+	    ic_oce2pism_anoforce_offset_temp_oce_regridded
+	fi
+
+	if [ "x${ANOMALY_OCEAN_SALINITY:-0}" == "x1" ] ; then
+	    ic_oce2pism_anoforce_offset_salt_oce_regridded
+	fi
+    fi
+    
     #iterative_coupling_ocean_pism_set_options
     iterative_coupling_ocean_pism_regrid_set_time_axis ${PISM_OCEAN_FORCING_FILE}
     iterative_coupling_pism_regrid_add_xy_array ${PISM_OCEAN_FORCING_FILE} "ocean"
@@ -930,5 +949,139 @@ function iterative_coupling_ocean_pism_fesom2pism_collapse_depth {
 
     unset _cdovert_sel_flag _file_depth _file_input
 }
+
+################################################################################
+################################################################################
+# D E T A I L S   :: Hydrographic (Oceanographic) anomaly forcing
+################################################################################
+################################################################################
+## @fn ic_oce2pism_anoforce_initialize()
+## @brief
+## Initilize anomaly forcing
+##
+## To use anomaly forcing, we have to initilize some additional
+## variables, which occurs here.
+ic_oce2pism_anoforce_initialize(){
+    echo""; echo -e "\t\t*   initilize anomaly forcing (variables and file names)"
+    #
+    # Hydrographic/Ocean REFERENCE data and its variables. These could
+    # be the "truth".
+    #
+    REFERENCE_OCEAN_FNAME=""
+    REFERENCE_OCEAN_VNAME_TEMP_OCEAN="theta_ocean"
+    REFERENCE_OCEAN_VNAME_SALT_OCEAN="salinity_ocean"
+    REFERENCE_OCEAN_VNAME_BASIN="basins"
+    REFERENCE_OCEAN_VNAME_RETREAT="land_ice_area_fraction_retreat"
+    
+    #
+    # Hydrographic/Ocean BASE STATE and it variables. For a climate
+    # warming simulations, this BASE STATE could prepresent the
+    # control climate piControl, for instance.
+    #
+    BASE_STATE_OCEAN_FNAME=""
+    BASE_STATE_OCEAN_VNAME_TEMP_OCEAN=""
+    BASE_STATE_OCEAN_VNAME_SALT_OCEAN=""
+
+    #
+    # Thresholds
+    #
+    OCEAN_TEMP_LOWER_THRESHOLD=${OCEAN_TEMP_LOWER_THRESHOLD:--260.}    
+    OCEAN_SALT_LOWER_THRESHOLD=${OCEAN_SALT_LOWER_THRESHOLD:-0.0}
+
+    #
+    # Report
+    #
+    echo  -e "\t\t*   - Reference  ${REFERENCE_OCEAN_FNAME:?Missing variable}"
+    echo  -e "\t\t*   - Base state ${BASE_STATE_OCEAN_FNAME:?Missing variable}"
+}
+
+## @fn ic_oce2pism_anoforce_offset_temp_oce_regridded()
+## @brief
+## Ocean temperature as an anomaly on top of a reference
+##
+## Ocean temperature from the anomaly of the forcing on the
+## reference. All the calculations are performed on the regridded ice
+## sheet model domain.
+ic_oce2pism_anoforce_offset_temp_oce_regridded(){
+    echo""; echo -e "\t\t*   anomaly ocean temperature evolution (offset)"
+
+    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+       ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
+
+    _ic_oce2pism_anoforce_addition_regridded \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+	${BASE_STATE_OCEAN_FNAME} \
+	${REFERENCE_VNAME_TEMP_AIR} \
+	${REFERENCE_FNAME} \
+	${REFERENCE_VNAME_TEMP_AIR} \
+	${OCEAN_TEMP_LOWER_THRESHOLD}
+}
+
+## @fn ic_oce2pism_anoforce_offset_salt_oce_regridded()
+## @brief
+## Ocean salinity as an anomaly on top of a reference
+##
+## Ocean salinity from the anomaly of the forcing on the reference.
+## All the calculations are performed on the regridded ice sheet model
+## domain.  
+ic_oce2pism_anoforce_offset_salt_oce_regridded() {    
+    echo""; echo -e "\t\t*   anomaly ocean salinity evolution (offset)"
+    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+       ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
+
+    _ic_oce2pism_anoforce_addition_regridded \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+	${BASE_STATE_OCEAN_FNAME} \
+	${REFERENCE_VNAME_TEMP_AIR} \
+	${REFERENCE_FNAME} \
+	${REFERENCE_VNAME_TEMP_AIR} \
+	${OCEAN_SALT_LOWER_THRESHOLD}
+}
+
+
+## @fn _ic_oce2pism_anoforce_addition_regridded()
+## @brief
+## Computes the forcing as and additive anomaly on top of a reference
+##
+## This internal function computes the forcing based on an additive
+## anomaly of a forcing field on top of a reference reference field.
+_ic_oce2pism_anoforce_addition_regridded() {
+    _input_force_file=${1:?Missing first input}
+    _output_force_file=${2:?Missing second input}
+    _base_state_force_file=${3:?Missing third input}
+    _force_var=${4:?Missing fourth input}
+    _reference_file=${5:?Missing fifth input}
+    _reference_var=${6:?Missing sixth input}
+    _multi_value_min=${8:-0}
+
+
+    #
+    # Check existences of input files
+    #
+    for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
+	if [ ! -f $_file ] ; then
+	    echo "** Missing file $_file"
+	    echo "S T O P"
+	    exit 3
+	fi
+    done
+    # In case $_input and $_output are identical
+    if [ "x${_input_force_file}" == "x${_output_force_file}" ] ; then
+	mv $_input_force_file ${_input_force_file}.NoAnomaly.tmp.nc
+        _input_force_file=${_input_force_file}.NoAnomaly.tmp.nc
+    fi
+    
+    #
+    # Do the math: Var = max(multi_value_min, Var_ref + (Var_forcing-Var_forcing_base))
+    #
+    cdo -O -setvar,$_force_var -maxc,$_multi_value_min \
+        -add -selvar,$_reference_var $_reference_file \
+        -sub -selvar,$_force_var $_input_force_file \
+             -selvar,$_force_var $_base_state_force_file \
+	$_output_force_file
+}
+
 
 # -- last line
