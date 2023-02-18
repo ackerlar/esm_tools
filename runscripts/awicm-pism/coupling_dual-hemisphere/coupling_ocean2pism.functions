@@ -973,6 +973,14 @@ ic_oce2pism_anoforce_initialize(){
     REFERENCE_OCEAN_VNAME_RETREAT="land_ice_area_fraction_retreat"
 
     #
+    # Forcing data from driving ocean climate/earth system model
+    #
+    FORCING_OCEAN_VNAME_TEMP_OCEAN="temp"
+    FORCING_OCEAN_VNAME_SALT_OCEAN="salt"
+    FORCING_OCEAN_VNAME_TEMP_OCEAN=${REFERENCE_OCEAN_VNAME_TEMP_OCEAN}
+    FORCING_OCEAN_VNAME_SALT_OCEAN=${REFERENCE_OCEAN_VNAME_SALT_OCEAN}
+
+    #
     # Hydrographic/Ocean BASE STATE and it variables. For a climate
     # warming simulations, this BASE STATE could prepresent the
     # control climate piControl, for instance.
@@ -1017,11 +1025,15 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
     mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
        ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc
 
+	#todo:delete
+	echo " OCEAN FILE $(cdo -s showvar ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc)"
+
     _ic_oce2pism_anoforce_addition_regridded \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+	${FORCING_OCEAN_VNAME_TEMP_OCEAN} \
 	${BASE_STATE_OCEAN_FNAME} \
-	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
+	${BASE_STATE_OCEAN_VNAME_TEMP_OCEAN} \
 	${REFERENCE_OCEAN_FNAME} \
 	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
 	${OCEAN_TEMP_LOWER_THRESHOLD}
@@ -1043,10 +1055,11 @@ ic_oce2pism_anoforce_offset_salt_oce_regridded() {
     _ic_oce2pism_anoforce_addition_regridded \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+	${FORCING_OCEAN_VNAME_SALT_OCEAN} \
 	${BASE_STATE_OCEAN_FNAME} \
-	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
+	${BASE_STATE_OCEAN_VNAME_SALT_OCEAN} \
 	${REFERENCE_OCEAN_FNAME} \
-	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
+	${REFERENCE_OCEAN_VNAME_SALT_AIR} \
 	${OCEAN_SALT_LOWER_THRESHOLD}
 }
 
@@ -1059,12 +1072,12 @@ ic_oce2pism_anoforce_offset_salt_oce_regridded() {
 _ic_oce2pism_anoforce_addition_regridded() {
     _input_force_file=${1:?Missing first input}
     _output_force_file=${2:?Missing second input}
-    _base_state_force_file=${3:?Missing third input}
-    _force_var=${4:?Missing fourth input}
-    _reference_file=${5:?Missing fifth input}
-    _reference_var=${6:?Missing sixth input}
+    _force_var=${3:?Missing third input}
+    _base_state_force_file=${4:?Missing forth input}
+    _base_state_force_var=${5:?Missing fifth input}
+    _reference_file=${5:?Missing sixth input}
+    _reference_var=${7:?Missing seventh input}
     _multi_value_min=${8:-0}
-
 
     #
     # Check existences of input files
@@ -1088,7 +1101,7 @@ _ic_oce2pism_anoforce_addition_regridded() {
     cdo -O -setvar,$_force_var -maxc,$_multi_value_min \
         -add -selvar,$_reference_var $_reference_file \
         -sub -selvar,$_force_var $_input_force_file \
-             -selvar,$_force_var $_base_state_force_file \
+             -selvar,$_base_state_force_var $_base_state_force_file \
         $_output_force_file
 }
 

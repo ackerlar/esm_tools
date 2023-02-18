@@ -2063,7 +2063,7 @@ ic_atm2pism_anoforce_offset_temp_air_regridded() {
 	   ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
 
 	#todo:delete
-	#echo " temperature.nc $(cdo -s showvar ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc)"
+	echo " temperature.nc $(cdo -s showvar ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc)"
 
 	_ic_atm2pism_anoforce_addition_regridded \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
@@ -2174,15 +2174,15 @@ _ic_atm2pism_anoforce_addition_regridded() {
     # Check existences of input files
     #
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
-	if [ ! -f $_file ] ; then
-	    echo "ERROR: Missing file $_file"
-	    echo "S T O P"
-	    exit 3
-	fi
+        if [ ! -f $_file ] ; then
+            echo "ERROR: Missing file $_file"
+            echo "S T O P"
+            exit 3
+        fi
     done
     # In case $_input and $_output are identical
     if [ "x${_input_force_file}" == "x${_output_force_file}" ] ; then
-	mv $_input_force_file ${_input_force_file}.NoAnomaly.tmp.nc
+        mv $_input_force_file ${_input_force_file}.NoAnomaly.tmp.nc
         _input_force_file=${_input_force_file}.NoAnomaly.tmp.nc
     fi
 
