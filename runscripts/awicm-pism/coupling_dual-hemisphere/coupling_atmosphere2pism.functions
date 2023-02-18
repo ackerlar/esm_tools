@@ -125,9 +125,8 @@ atmosphere2pism() {
     #
     # Here ANOMALY in air-temperature and precipitation
     #
-    if [ "x${ANOMALY_AIR_TEMPERATURE:-0}" == "x1" || \
-         "x${ANOMALY_PRECIPITATION:-0}" == "x1" ]
-    then
+    if [[ "x${ANOMALY_AIR_TEMPERATURE:-0}" == "x1" || \
+         "x${ANOMALY_PRECIPITATION:-0}" == "x1" ]] ; then
 	# Initialize require variables and file names
 	ic_atm2pism_anoforce_initialize
 

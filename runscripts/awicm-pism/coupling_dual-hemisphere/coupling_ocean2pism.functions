@@ -186,9 +186,8 @@ function ocean2pism {
     #
     # Here ANOMALY in ocean-temperature and salinity
     #
-    if [ "x${ANOMALY_OCEAN_TEMPERATURE:-0}" == "x1" || \
-             "x${ANOMALY_OCEAN_SALINITY:-0}" == "x1" ]
-    then
+    if [[ "x${ANOMALY_OCEAN_TEMPERATURE:-0}" == "x1" || \
+             "x${ANOMALY_OCEAN_SALINITY:-0}" == "x1" ]] ; then
 	# Initialize require variables and file names
 	ic_oce2pism_anoforce_initialize
 
