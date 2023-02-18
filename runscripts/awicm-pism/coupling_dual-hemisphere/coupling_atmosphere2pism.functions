@@ -134,7 +134,9 @@ atmosphere2pism() {
 	if [ "x${ANOMALY_AIR_TEMPERATURE:-0}" == "x1" ] ; then
 	    ic_atm2pism_anoforce_offset_temp_air_regridded
 	    ic_atm2pism_anoforce_offset_temp_firn_regridded
-	    TEMP_ANOM=0 # To ensure that we do not have any double accounting
+	    # To ensure that we do not have any double accounting
+	    TEMP_ANOM=0
+	    REDUCE_TEMP=0
 	fi
 
 	if [ "x${ANOMALY_PRECIPITATION:-0}" == "x1" ] ; then
@@ -146,7 +148,8 @@ atmosphere2pism() {
 		# Precipition as an offset (Addition)
 		ic_atm2pism_anoforce_offset_precipitation_regridded
 	    fi
-	    PREC_ANOM=0 # To ensure that we do not have any double accounting
+	    # To ensure that we do not have any double accounting
+	    PREC_ANOM=0
 	fi
     fi
 
