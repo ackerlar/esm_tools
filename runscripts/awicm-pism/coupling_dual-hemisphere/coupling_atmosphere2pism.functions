@@ -2126,8 +2126,6 @@ ic_atm2pism_anoforce_scale_precipitation_regridded() {
 	    ${REFERENCE_ATMOS_VNAME_PRECIP}
 }
 
-
-
 ## @fn _ic_atm2pism_anoforce_addition_regridded()
 ## @brief
 ## Computes the forcing as and additive anomaly on top of a reference

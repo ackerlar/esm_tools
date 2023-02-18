@@ -1005,12 +1005,12 @@ ic_oce2pism_anoforce_initialize(){
 ic_oce2pism_anoforce_offset_temp_oce_regridded(){
     echo""; echo -e "\t\t*   anomaly ocean temperature evolution (offset)"
 
-    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
-       ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
+    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+       ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc
 
     _ic_oce2pism_anoforce_addition_regridded \
-	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
-	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
 	${BASE_STATE_OCEAN_FNAME} \
 	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
 	${REFERENCE_OCEAN_FNAME} \
@@ -1027,19 +1027,19 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
 ## domain.
 ic_oce2pism_anoforce_offset_salt_oce_regridded() {
     echo""; echo -e "\t\t*   anomaly ocean salinity evolution (offset)"
-    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
-       ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
+
+    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+       ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc
 
     _ic_oce2pism_anoforce_addition_regridded \
-	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
-	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
 	${BASE_STATE_OCEAN_FNAME} \
 	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
 	${REFERENCE_OCEAN_FNAME} \
 	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
 	${OCEAN_SALT_LOWER_THRESHOLD}
 }
-
 
 ## @fn _ic_oce2pism_anoforce_addition_regridded()
 ## @brief
