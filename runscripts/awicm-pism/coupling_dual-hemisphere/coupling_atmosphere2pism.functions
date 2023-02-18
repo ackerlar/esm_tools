@@ -2068,11 +2068,11 @@ ic_atm2pism_anoforce_offset_temp_air_regridded() {
 	_ic_atm2pism_anoforce_addition_regridded \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
-	    ${FORCING_ATMOS_VNAME_TEMP_AIR} \
-	    ${BASE_STATE_ATMOS_FNAME} \
-	    ${BASE_STATE_ATMOS_VNAME_TEMP_AIR} \
-	    ${REFERENCE_ATMOS_FNAME} \
-	    ${REFERENCE_ATMOS_VNAME_TEMP_AIR}
+	    ${FORCING_ATMOS_VNAME_TEMP_AIR:?Miss var 1} \
+	    ${BASE_STATE_ATMOS_FNAME:?Miss var 2} \
+	    ${BASE_STATE_ATMOS_VNAME_TEMP_AIR:?Miss var 3} \
+	    ${REFERENCE_ATMOS_FNAME:?Miss var 4} \
+	    ${REFERENCE_ATMOS_VNAME_TEMP_AIR:?Miss var 6}
 
 	#todo:rm
 	if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc ] ; then
@@ -2098,11 +2098,11 @@ ic_atm2pism_anoforce_offset_temp_firn_regridded() {
 	_ic_atm2pism_anoforce_addition_regridded \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.NoAnomaly.nc \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
-	    ${FORCING_ATMOS_VNAME_TEMP_FIRN} \
-	    ${BASE_STATE_ATMOS_FNAME} \
-	    ${BASE_STATE_ATMOS_VNAME_TEMP_FIRN} \
-	    ${REFERENCE_ATMOS_FNAME} \
-	    ${REFERENCE_ATMOS_VNAME_TEMP_FIRN}
+	    ${FORCING_ATMOS_VNAME_TEMP_FIRN:?Miss var 1} \
+	    ${BASE_STATE_ATMOS_FNAME:?Miss var 2} \
+	    ${BASE_STATE_ATMOS_VNAME_TEMP_FIRN:?Miss var 3} \
+	    ${REFERENCE_ATMOS_FNAME:?Miss var 4} \
+	    ${REFERENCE_ATMOS_VNAME_TEMP_FIRN:?Miss var 5}
 
 	#
 	# Firn temperature has be at or below the freezing temperature
@@ -2138,12 +2138,12 @@ ic_atm2pism_anoforce_offset_precipitation_regridded() {
 	_ic_atm2pism_anoforce_addition_regridded \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.NoAnomaly.nc \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
-	    ${FORCING_ATMOS_VNAME_PRECIP} \
-	    ${BASE_STATE_ATMOS_FNAME} \
-	    ${BASE_STATE_ATMOS_VNAME_PRECIP} \
-	    ${REFERENCE_ATMOS_VNAME_PRECIP} \
-	    ${REFERENCE_ATMOS_FNAME} \
-	    ${REFERENCE_ATMOS_VNAME_PRECIP}
+	    ${FORCING_ATMOS_VNAME_PRECIP:?Miss var 1} \
+	    ${BASE_STATE_ATMOS_FNAME:?Miss var 2} \
+	    ${BASE_STATE_ATMOS_VNAME_PRECIP:?Miss var 3} \
+	    ${REFERENCE_ATMOS_VNAME_PRECIP:?Miss var 4} \
+	    ${REFERENCE_ATMOS_FNAME:?Miss var 5} \
+	    ${REFERENCE_ATMOS_VNAME_PRECIP:?Miss var 6}
 
 	#todo:rm
 	if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc ] ; then
@@ -2168,12 +2168,12 @@ ic_atm2pism_anoforce_scale_precipitation_regridded() {
 	_ic_atm2pism_anoforce_multiplication_regridded \
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.NoAnomaly.nc \
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
-            ${FORCING_ATMOS_VNAME_PRECIP} \
-            ${BASE_STATE_ATMOS_FNAME} \
-            ${BASE_STATE_ATMOS_VNAME_PRECIP} \
-            ${REFERENCE_ATMOS_VNAME_PRECIP} \
-            ${REFERENCE_ATMOS_FNAME} \
-            ${REFERENCE_ATMOS_VNAME_PRECIP}
+            ${FORCING_ATMOS_VNAME_PRECIP:?Miss var 1} \
+            ${BASE_STATE_ATMOS_FNAME:?Miss var 2} \
+            ${BASE_STATE_ATMOS_VNAME_PRECIP:?Miss var 3} \
+            ${REFERENCE_ATMOS_VNAME_PRECIP:?Miss var 4} \
+            ${REFERENCE_ATMOS_FNAME:?Miss var 5} \
+            ${REFERENCE_ATMOS_VNAME_PRECIP:?Miss var 6}
 }
 
 ## @fn _ic_atm2pism_anoforce_addition_regridded()
@@ -2194,6 +2194,7 @@ _ic_atm2pism_anoforce_addition_regridded() {
     #
     # Check existences of input files
     #
+    echo "_ic_atm2pism_anoforce_addition_regridded : $*"
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
         if [ ! -f $_file ] ; then
             echo "ERROR: Missing input file $_file"
@@ -2238,6 +2239,7 @@ _ic_atm2pism_anoforce_multiplication_regridded() {
     #
     # Check existences of input files
     #
+    echo "_ic_atm2pism_anoforce_multiplication_regridded : $*"
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
         if [ ! -f $_file ] ; then
             echo "ERROR: Missing input file $_file"

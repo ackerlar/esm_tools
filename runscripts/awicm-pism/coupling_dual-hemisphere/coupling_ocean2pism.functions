@@ -1031,12 +1031,12 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
     _ic_oce2pism_anoforce_addition_regridded \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
-	${FORCING_OCEAN_VNAME_TEMP_OCEAN} \
-	${BASE_STATE_OCEAN_FNAME} \
-	${BASE_STATE_OCEAN_VNAME_TEMP_OCEAN} \
-	${REFERENCE_OCEAN_FNAME} \
-	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
-	${OCEAN_TEMP_LOWER_THRESHOLD}
+	${FORCING_OCEAN_VNAME_TEMP_OCEAN:?Miss Var 1} \
+	${BASE_STATE_OCEAN_FNAME:?Miss Var 2} \
+	${BASE_STATE_OCEAN_VNAME_TEMP_OCEAN:?Miss Var 3} \
+	${REFERENCE_OCEAN_FNAME:?Miss Var 4} \
+	${REFERENCE_OCEAN_VNAME_TEMP_AIR:?Miss Var 5} \
+	${OCEAN_TEMP_LOWER_THRESHOLD:?Miss Var 6}
 
     #todo:rm
     if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} ] ; then
@@ -1062,12 +1062,12 @@ ic_oce2pism_anoforce_offset_salt_oce_regridded() {
     _ic_oce2pism_anoforce_addition_regridded \
         ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc \
         ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
-        ${FORCING_OCEAN_VNAME_SALT_OCEAN} \
-        ${BASE_STATE_OCEAN_FNAME} \
-        ${BASE_STATE_OCEAN_VNAME_SALT_OCEAN} \
-        ${REFERENCE_OCEAN_FNAME} \
-        ${REFERENCE_OCEAN_VNAME_SALT_AIR} \
-        ${OCEAN_SALT_LOWER_THRESHOLD}
+        ${FORCING_OCEAN_VNAME_SALT_OCEAN:?Miss Var 1} \
+        ${BASE_STATE_OCEAN_FNAME:?Miss Var 2} \
+        ${BASE_STATE_OCEAN_VNAME_SALT_OCEAN:?Miss Var 3} \
+        ${REFERENCE_OCEAN_FNAME:?Miss Var 4} \
+        ${REFERENCE_OCEAN_VNAME_SALT_AIR:?Miss Var 5} \
+        ${OCEAN_SALT_LOWER_THRESHOLD:?Miss Var 6}
 
     #todo:rm
     if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} ] ; then
@@ -1096,6 +1096,7 @@ _ic_oce2pism_anoforce_addition_regridded() {
     #
     # Check existences of input files
     #
+    echo "_ic_oce2pism_anoforce_addition_regridded : $*"
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
 	if [ ! -f $_file ] ; then
 	    echo "ERROR: Missing input file $_file"
