@@ -2198,14 +2198,14 @@ _ic_atm2pism_anoforce_multiplication_regridded() {
     #
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
 	if [ ! -f $_file ] ; then
-	    echo "** Missing file $_file"
-	    echo "S T O P"
-	    exit 3
-	fi
+	    echo "ERROR: Anomaly atmosphere coupling; Missing file $_file"
+            echo "S T O P"
+            exit 3
+        fi
     done
     # In case $_input and $_output are identical
     if [ "x${_input_force_file}" == "x${_output_force_file}" ] ; then
-	mv $_input_force_file ${_input_force_file}.NoAnomaly.tmp.nc
+        mv $_input_force_file ${_input_force_file}.NoAnomaly.tmp.nc
         _input_force_file=${_input_force_file}.NoAnomaly.tmp.nc
     fi
 
@@ -2214,8 +2214,8 @@ _ic_atm2pism_anoforce_multiplication_regridded() {
     #
     cdo -O -setvar,$_force_var \
         -mul -selvar,$_reference_var $_reference_file \
-	-fillmiss2 -minc,$_multi_value_max \
+        -fillmiss2 -minc,$_multi_value_max \
         -div -selvar,$_force_var $_input_force_file \
              -selvar,$_force_var $_base_state_force_file \
-	$_output_force_file
+        $_output_force_file
 }
