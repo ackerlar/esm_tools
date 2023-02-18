@@ -86,14 +86,14 @@ function ocean2pism {
 	    # ice shelf conditions
 	    #
 	    #PISM_OCEAN_SWITCH="-ocean pico -ocean.pico.continental_shelf_depth 700"
-            
+
             PISM_OCEAN_SWITCH="-ocean pico"
 	    PISM_OCEAN_FILE_SWITCH="-ocean_pico_file ${PISM_OCEAN_FORCING_FILE}"
             PISM_OCEAN_PICO_BASINS_FILE=${PISM_OCEAN_PICO_BASINS_FILE:-${PISM_OCEAN_FORCING_FILE}}
             echo " * Doing iterative_coupling_ocean_pism_prepare_ocean_tempsalt_forcing ..."
-            iterative_coupling_ocean_pism_prepare_ocean_tempsalt_forcing 	
+            iterative_coupling_ocean_pism_prepare_ocean_tempsalt_forcing
             echo "      ...done."
-            
+
             #echo " * Doing iterative_coupling_ocean_pism_prepare_pico_ocean_forcing ..."
             #iterative_coupling_ocean_pism_prepare_pico_ocean_forcing ${PISM_OCEAN_PICO_BASINS_FILE} ${PISM_OCEAN_FORCING_FILE}
             #echo "      ...done."
@@ -161,7 +161,7 @@ function ocean2pism {
 	    ;;
 	"OCEANTEMPSALT")
             iterative_coupling_ocean_pism_compute_ocean_tempsalt_forcing ${PISM_OCEAN_FORCING_FILE}
-            ;; 
+            ;;
         "PICO_OCEAN")
             iterative_coupling_ocean_pism_compute_ocean_tempsalt_forcing ${PISM_OCEAN_FORCING_FILE}
             PISM_OCEAN_PICO_BASINS_FILE=${PISM_OCEAN_PICO_BASINS_FILE:-${PISM_OCEAN_FORCING_FILE}}
@@ -200,15 +200,15 @@ function ocean2pism {
 	    ic_oce2pism_anoforce_offset_salt_oce_regridded
 	fi
     fi
-    
+
     #iterative_coupling_ocean_pism_set_options
     iterative_coupling_ocean_pism_regrid_set_time_axis ${PISM_OCEAN_FORCING_FILE}
     iterative_coupling_pism_regrid_add_xy_array ${PISM_OCEAN_FORCING_FILE} "ocean"
 
     ln -sf "${COUPLE_DIR}/${PISM_HEMISPHERE}/ocean_forcing4pism_ver${VERSION_pism}.${INTERPOL_TYPE_OCE}.${CHUNK_DATE_TAG_pism}.nc" "${COUPLE_DIR}/${PISM_HEMISPHERE}/latest_ocean_forcing_file.nc"
-    
+
     for file in ${cleanup_list} ; do test -f $file && rm $file ; done
-    
+
     unset cleanup_list file
 
     unset NOCOLOR GREEN
@@ -217,7 +217,7 @@ function ocean2pism {
     max_retry=12
     retry=0
     sleep 10 # Minimum time for st_new.sh to finish
-        
+
     while [ ${retry} -lt ${max_retry} ]; do
         if [ -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/latest_ocean_forcing_file.nc ]; then
             break # call results.sh outside loop
@@ -256,7 +256,7 @@ function save_griddes {
 #
 function iterative_coupling_ocean_pism_prepare_ocean_direct_forcing {
     echo "Preparing direct ocean forcing (${PISM_OCEAN_SWITCH:-Unknown}) file with sensible units..."
-    # PISM0.7 : shelfbtemp [degC], shelfbmassflux [kg m-2 s-1] 
+    # PISM0.7 : shelfbtemp [degC], shelfbmassflux [kg m-2 s-1]
 ##    $cdo -select,name=wnet,Tsurf
 
     # Rename all input variables
@@ -295,7 +295,7 @@ EOF
     $cdo setpartabn,${cdo_table_file},convert \
 	${COUPLE_DIR}/ocean_file_for_ice.nc \
 	ocean_file_for_ice.pism_names.nc
-    
+
     echo "     ...done."
 }
 
@@ -967,25 +967,25 @@ ic_oce2pism_anoforce_initialize(){
     # Hydrographic/Ocean REFERENCE data and its variables. These could
     # be the "truth".
     #
-    REFERENCE_OCEAN_FNAME=""
+    REFERENCE_OCEAN_FNAME="/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
     REFERENCE_OCEAN_VNAME_TEMP_OCEAN="theta_ocean"
     REFERENCE_OCEAN_VNAME_SALT_OCEAN="salinity_ocean"
     REFERENCE_OCEAN_VNAME_BASIN="basins"
     REFERENCE_OCEAN_VNAME_RETREAT="land_ice_area_fraction_retreat"
-    
+
     #
     # Hydrographic/Ocean BASE STATE and it variables. For a climate
     # warming simulations, this BASE STATE could prepresent the
     # control climate piControl, for instance.
     #
-    BASE_STATE_OCEAN_FNAME=""
-    BASE_STATE_OCEAN_VNAME_TEMP_OCEAN=""
-    BASE_STATE_OCEAN_VNAME_SALT_OCEAN=""
+    BASE_STATE_OCEAN_FNAME="/work/ab0246/a270096/share/pism/ANT.16km/ocean_forcing4pism_base_state.pism_sh.nc"
+    BASE_STATE_OCEAN_VNAME_TEMP_OCEAN="theta_ocean"
+    BASE_STATE_OCEAN_VNAME_SALT_OCEAN="salinity_ocean"
 
     #
     # Thresholds
     #
-    OCEAN_TEMP_LOWER_THRESHOLD=${OCEAN_TEMP_LOWER_THRESHOLD:--260.}    
+    OCEAN_TEMP_LOWER_THRESHOLD=${OCEAN_TEMP_LOWER_THRESHOLD:--260.}
     OCEAN_SALT_LOWER_THRESHOLD=${OCEAN_SALT_LOWER_THRESHOLD:-0.0}
 
     #
@@ -1012,9 +1012,9 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
 	${BASE_STATE_OCEAN_FNAME} \
-	${REFERENCE_VNAME_TEMP_AIR} \
-	${REFERENCE_FNAME} \
-	${REFERENCE_VNAME_TEMP_AIR} \
+	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
+	${REFERENCE_OCEAN_FNAME} \
+	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
 	${OCEAN_TEMP_LOWER_THRESHOLD}
 }
 
@@ -1024,8 +1024,8 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
 ##
 ## Ocean salinity from the anomaly of the forcing on the reference.
 ## All the calculations are performed on the regridded ice sheet model
-## domain.  
-ic_oce2pism_anoforce_offset_salt_oce_regridded() {    
+## domain.
+ic_oce2pism_anoforce_offset_salt_oce_regridded() {
     echo""; echo -e "\t\t*   anomaly ocean salinity evolution (offset)"
     mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
        ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
@@ -1034,9 +1034,9 @@ ic_oce2pism_anoforce_offset_salt_oce_regridded() {
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
 	${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
 	${BASE_STATE_OCEAN_FNAME} \
-	${REFERENCE_VNAME_TEMP_AIR} \
-	${REFERENCE_FNAME} \
-	${REFERENCE_VNAME_TEMP_AIR} \
+	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
+	${REFERENCE_OCEAN_FNAME} \
+	${REFERENCE_OCEAN_VNAME_TEMP_AIR} \
 	${OCEAN_SALT_LOWER_THRESHOLD}
 }
 
@@ -1072,7 +1072,7 @@ _ic_oce2pism_anoforce_addition_regridded() {
 	mv $_input_force_file ${_input_force_file}.NoAnomaly.tmp.nc
         _input_force_file=${_input_force_file}.NoAnomaly.tmp.nc
     fi
-    
+
     #
     # Do the math: Var = max(multi_value_min, Var_ref + (Var_forcing-Var_forcing_base))
     #
