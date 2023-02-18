@@ -45,6 +45,10 @@ def prepare_environment(config):
             "REDUCE_TEMP": int(config[config["general"]["setup_name"]].get("reduce_temp", 0)),
             "REDUCE_TEMP_BY": config[config["general"]["setup_name"]].get("reduce_temp_by", 1),
             "PISM_HEMISPHERE": config["general"]["setup_name"],
+            "ANOMALY_AIR_TEMPERATURE": int(config[config["general"]["setup_name"]].get("ANOMALY_AIR_TEMPERATURE", 0)),
+            "ANOMALY_PRECIPITATION": int(config[config["general"]["setup_name"]].get("ANOMALY_PRECIPITATION", 0)),
+            "ANOMALY_OCEAN_TEMPERATURE": int(config[config["general"]["setup_name"]].get("ANOMALY_OCEAN_TEMPERATURE", 0)),
+            "ANOMALY_OCEAN_SALINITY": int(config[config["general"]["setup_name"]].get("ANOMALY_OCEAN_SALINITY", 0)),
             #"PISM_OCEAN_PICO_BASINS_FILE": "/home/ollie/lackerma/pool_pism/basins/antarctica.16km.nc",
 
             #"RESTART_DIR_pism": config[config["general"]["setup_name"]]["experiment_restart_in_dir"],
