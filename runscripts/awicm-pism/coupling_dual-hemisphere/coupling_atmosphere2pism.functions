@@ -2234,7 +2234,7 @@ _ic_atm2pism_anoforce_multiplication_regridded() {
     _force_var=${3:?Missing third input}
     _base_state_force_file=${4:?Missing forth input}
     _base_state_force_var=${5:?Missing fifth input}
-    _reference_file=${5:?Missing sixth input}
+    _reference_file=${6:?Missing sixth input}
     _reference_var=${7:?Missing seventh input}
     _multi_value_max=${8:-10}
     #??_multi_value_min=${9:-0}
