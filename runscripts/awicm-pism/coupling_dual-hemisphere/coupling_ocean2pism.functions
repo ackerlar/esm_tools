@@ -995,9 +995,11 @@ ic_oce2pism_anoforce_initialize(){
 
     for _file in $REFERENCE_OCEAN_FNAME $BASE_STATE_OCEAN_FNAME ; do
 	if [ ! -f $_file ] ; then
-	    echo " *** MISSING file $_file"
+	    echo "ERROR: Ocean anomaly coupling; MISSING file $_file"
 	    echo " S T O P"
 	    exit 2
+        else
+            echo  -e "\t\t*     + $(basename $_file): $(cdo -s showvar $_file)"
 	fi
     done
 }
@@ -1069,7 +1071,7 @@ _ic_oce2pism_anoforce_addition_regridded() {
     #
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
 	if [ ! -f $_file ] ; then
-	    echo "ERROR: Anomaly ocean coupling; Missing file $_file"
+	    echo "ERROR: Missing file $_file"
             echo "S T O P"
             exit 3
         fi
