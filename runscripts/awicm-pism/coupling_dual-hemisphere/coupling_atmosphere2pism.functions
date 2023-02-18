@@ -2073,6 +2073,13 @@ ic_atm2pism_anoforce_offset_temp_air_regridded() {
 	    ${BASE_STATE_ATMOS_VNAME_TEMP_AIR} \
 	    ${REFERENCE_ATMOS_FNAME} \
 	    ${REFERENCE_ATMOS_VNAME_TEMP_AIR}
+
+	#todo:rm
+	if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc ] ; then
+	    echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc"
+            echo "S T O P"
+            exit 3
+	fi
 }
 
 ## @fn ic_atm2pism_anoforce_offset_temp_firn_regridded()
@@ -2107,6 +2114,13 @@ ic_atm2pism_anoforce_offset_temp_firn_regridded() {
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.tmp.nc \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
 	    && rm -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.tmp.nc
+
+	#todo:rm
+	if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc ] ; then
+	    echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc"
+            echo "S T O P"
+            exit 3
+	fi
 }
 
 ## @fn ic_atm2pism_anoforce_offset_precipitation_regridded()
@@ -2130,6 +2144,13 @@ ic_atm2pism_anoforce_offset_precipitation_regridded() {
 	    ${REFERENCE_ATMOS_VNAME_PRECIP} \
 	    ${REFERENCE_ATMOS_FNAME} \
 	    ${REFERENCE_ATMOS_VNAME_PRECIP}
+
+	#todo:rm
+	if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc ] ; then
+	    echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc"
+            echo "S T O P"
+            exit 3
+	fi
 }
 
 ## @fn ic_atm2pism_anoforce_scale_precipitation_regridded()
@@ -2175,7 +2196,7 @@ _ic_atm2pism_anoforce_addition_regridded() {
     #
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
         if [ ! -f $_file ] ; then
-            echo "ERROR: Missing file $_file"
+            echo "ERROR: Missing input file $_file"
             echo "S T O P"
             exit 3
         fi
@@ -2219,7 +2240,7 @@ _ic_atm2pism_anoforce_multiplication_regridded() {
     #
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
         if [ ! -f $_file ] ; then
-            echo "ERROR: Missing file $_file"
+            echo "ERROR: Missing input file $_file"
             echo "S T O P"
             exit 3
         fi
