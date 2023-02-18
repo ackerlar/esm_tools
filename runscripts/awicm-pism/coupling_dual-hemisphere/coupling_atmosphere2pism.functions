@@ -2016,12 +2016,20 @@ ic_atm2pism_anoforce_initialize(){
     REFERENCE_ATMOS_VNAME_SMB="climatic_mass_balance"
 
     #
+    # Forcing data from driving atmospheric climate/earth system model
+    #
+    FORCING_ATMOS_VNAME_TEMP_AIR="temp2"
+    FORCING_ATMOS_VNAME_TEMP_FIRN="tsurf"
+    FORCING_ATMOS_VNAME_PRECIP="aprt"
+
+    #
     # Atmospheric BASE STATE and it variables. For a climate warming
     # simulations, this BASE STATE could prepresent the control
     # climate piControl, for instance.
     #
     BASE_STATE_ATMOS_FNAME="/work/ab0246/a270096/share/pism/ANT.16km/atmo_given_file_base_state.pism_sh.nc"
     BASE_STATE_ATMOS_VNAME_TEMP_AIR="air_temp"
+    BASE_STATE_ATMOS_VNAME_TEMP_FIRN="ice_surface_temp"
     BASE_STATE_ATMOS_VNAME_PRECIP="precipitation"
     #??? BASE_STATE_ATMOS_VNAME_SMB=""
 
@@ -2054,11 +2062,15 @@ ic_atm2pism_anoforce_offset_temp_air_regridded() {
         mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
 	   ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
 
+	#todo:delete
+	#echo " temperature.nc $(cdo -s showvar ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc)"
+
 	_ic_atm2pism_anoforce_addition_regridded \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+	    ${FORCING_ATMOS_VNAME_TEMP_AIR} \
 	    ${BASE_STATE_ATMOS_FNAME} \
-	    ${REFERENCE_ATMOS_VNAME_TEMP_AIR} \
+	    ${BASE_STATE_ATMOS_VNAME_TEMP_AIR} \
 	    ${REFERENCE_ATMOS_FNAME} \
 	    ${REFERENCE_ATMOS_VNAME_TEMP_AIR}
 }
@@ -2079,8 +2091,9 @@ ic_atm2pism_anoforce_offset_temp_firn_regridded() {
 	_ic_atm2pism_anoforce_addition_regridded \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.NoAnomaly.nc \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
+	    ${FORCING_ATMOS_VNAME_TEMP_FIRN} \
 	    ${BASE_STATE_ATMOS_FNAME} \
-	    ${REFERENCE_ATMOS_VNAME_TEMP_FIRN} \
+	    ${BASE_STATE_ATMOS_VNAME_TEMP_FIRN} \
 	    ${REFERENCE_ATMOS_FNAME} \
 	    ${REFERENCE_ATMOS_VNAME_TEMP_FIRN}
 
@@ -2111,7 +2124,9 @@ ic_atm2pism_anoforce_offset_precipitation_regridded() {
 	_ic_atm2pism_anoforce_addition_regridded \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.NoAnomaly.nc \
 	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
+	    ${FORCING_ATMOS_VNAME_PRECIP} \
 	    ${BASE_STATE_ATMOS_FNAME} \
+	    ${BASE_STATE_ATMOS_VNAME_PRECIP} \
 	    ${REFERENCE_ATMOS_VNAME_PRECIP} \
 	    ${REFERENCE_ATMOS_FNAME} \
 	    ${REFERENCE_ATMOS_VNAME_PRECIP}
@@ -2130,12 +2145,14 @@ ic_atm2pism_anoforce_scale_precipitation_regridded() {
 	   ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.NoAnomaly.nc
 
 	_ic_atm2pism_anoforce_multiplication_regridded \
-	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.NoAnomaly.nc \
-	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
-	    ${BASE_STATE_ATMOS_FNAME} \
-	    ${REFERENCE_ATMOS_VNAME_PRECIP} \
-	    ${REFERENCE_ATMOS_FNAME} \
-	    ${REFERENCE_ATMOS_VNAME_PRECIP}
+            ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.NoAnomaly.nc \
+            ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
+            ${FORCING_ATMOS_VNAME_PRECIP} \
+            ${BASE_STATE_ATMOS_FNAME} \
+            ${BASE_STATE_ATMOS_VNAME_PRECIP} \
+            ${REFERENCE_ATMOS_VNAME_PRECIP} \
+            ${REFERENCE_ATMOS_FNAME} \
+            ${REFERENCE_ATMOS_VNAME_PRECIP}
 }
 
 ## @fn _ic_atm2pism_anoforce_addition_regridded()
@@ -2147,10 +2164,11 @@ ic_atm2pism_anoforce_scale_precipitation_regridded() {
 _ic_atm2pism_anoforce_addition_regridded() {
     _input_force_file=${1:?Missing first input}
     _output_force_file=${2:?Missing second input}
-    _base_state_force_file=${3:?Missing third input}
-    _force_var=${4:?Missing fourth input}
-    _reference_file=${5:?Missing fifth input}
-    _reference_var=${6:?Missing sixth input}
+    _force_var=${3:?Missing third input}
+    _base_state_force_file=${4:?Missing forth input}
+    _base_state_force_var=${5:?Missing fifth input}
+    _reference_file=${5:?Missing sixth input}
+    _reference_var=${7:?Missing seventh input}
 
     #
     # Check existences of input files
@@ -2174,7 +2192,7 @@ _ic_atm2pism_anoforce_addition_regridded() {
     cdo -O -setvar,$_force_var \
         -add -selvar,$_reference_var $_reference_file \
         -sub -selvar,$_force_var $_input_force_file \
-             -selvar,$_force_var $_base_state_force_file \
+             -selvar,$_base_state_force_var $_base_state_force_file \
 	$_output_force_file
 }
 
@@ -2188,19 +2206,20 @@ _ic_atm2pism_anoforce_addition_regridded() {
 _ic_atm2pism_anoforce_multiplication_regridded() {
     _input_force_file=${1:?Missing first input}
     _output_force_file=${2:?Missing second input}
-    _base_state_force_file=${3:?Missing third input}
-    _force_var=${4:?Missing fourth input}
-    _reference_file=${5:?Missing fifth input}
-    _reference_var=${6:?Missing sixth input}
-    _multi_value_max=${7:-10}
-    #??_multi_value_min=${8:-0}
+    _force_var=${3:?Missing third input}
+    _base_state_force_file=${4:?Missing forth input}
+    _base_state_force_var=${5:?Missing fifth input}
+    _reference_file=${5:?Missing sixth input}
+    _reference_var=${7:?Missing seventh input}
+    _multi_value_max=${8:-10}
+    #??_multi_value_min=${9:-0}
 
     #
     # Check existences of input files
     #
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
-	if [ ! -f $_file ] ; then
-	    echo "ERROR: Missing file $_file"
+        if [ ! -f $_file ] ; then
+            echo "ERROR: Missing file $_file"
             echo "S T O P"
             exit 3
         fi
@@ -2218,6 +2237,6 @@ _ic_atm2pism_anoforce_multiplication_regridded() {
         -mul -selvar,$_reference_var $_reference_file \
         -fillmiss2 -minc,$_multi_value_max \
         -div -selvar,$_force_var $_input_force_file \
-             -selvar,$_force_var $_base_state_force_file \
+             -selvar,$_base_state_force_var $_base_state_force_file \
         $_output_force_file
 }
