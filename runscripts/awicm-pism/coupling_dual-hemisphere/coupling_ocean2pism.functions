@@ -995,6 +995,12 @@ ic_oce2pism_anoforce_initialize(){
     OCEAN_TEMP_LOWER_THRESHOLD=${OCEAN_TEMP_LOWER_THRESHOLD:--260.}
     OCEAN_SALT_LOWER_THRESHOLD=${OCEAN_SALT_LOWER_THRESHOLD:-0.0}
 
+    #todo: rm
+    echo " ------------------------------------------------------------------"
+    pwd
+    ls
+    echo " ------------------------------------------------------------------"
+
     #
     # Report
     #
@@ -1035,7 +1041,7 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
         ${BASE_STATE_OCEAN_FNAME:?Miss Var 2} \
         ${BASE_STATE_OCEAN_VNAME_TEMP_OCEAN:?Miss Var 3} \
         ${REFERENCE_OCEAN_FNAME:?Miss Var 4} \
-        ${REFERENCE_OCEAN_VNAME_TEMP_AIR:?Miss Var 5} \
+        ${REFERENCE_OCEAN_VNAME_TEMP_OCEAN:?Miss Var 5} \
         ${OCEAN_TEMP_LOWER_THRESHOLD:?Miss Var 6}
 
     #todo:rm
@@ -1066,7 +1072,7 @@ ic_oce2pism_anoforce_offset_salt_oce_regridded() {
         ${BASE_STATE_OCEAN_FNAME:?Miss Var 2} \
         ${BASE_STATE_OCEAN_VNAME_SALT_OCEAN:?Miss Var 3} \
         ${REFERENCE_OCEAN_FNAME:?Miss Var 4} \
-        ${REFERENCE_OCEAN_VNAME_SALT_AIR:?Miss Var 5} \
+        ${REFERENCE_OCEAN_VNAME_SALT_OCEAN?Miss Var 5} \
         ${OCEAN_SALT_LOWER_THRESHOLD:?Miss Var 6}
 
     #todo:rm
