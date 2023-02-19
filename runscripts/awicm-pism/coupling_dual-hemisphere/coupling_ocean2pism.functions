@@ -995,15 +995,6 @@ ic_oce2pism_anoforce_initialize(){
     OCEAN_TEMP_LOWER_THRESHOLD=${OCEAN_TEMP_LOWER_THRESHOLD:--260.}
     OCEAN_SALT_LOWER_THRESHOLD=${OCEAN_SALT_LOWER_THRESHOLD:-0.0}
 
-    #todo: rm
-    echo " ------------------------------------------------------------------"
-    pwd
-    ls -l
-    echo " ------------------------------------------------------------------"
-    echo ${COUPLE_DIR}/${PISM_HEMISPHERE}/
-    ls -l ${COUPLE_DIR}/${PISM_HEMISPHERE}/
-    echo " ------------------------------------------------------------------"
-
     #
     # Report
     #
@@ -1031,14 +1022,8 @@ ic_oce2pism_anoforce_initialize(){
 ic_oce2pism_anoforce_offset_temp_oce_regridded(){
     echo""; echo -e "\t\t*   anomaly ocean temperature evolution (offset)"
 
-    #todo:old:rm:mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
-    #todo:old:rm:   ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc
-
     mv ${PISM_OCEAN_FORCING_FILE} \
        ${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc
-
-        #todo:delete
-        echo " OCEAN forcing file $(cdo -s showvar ${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc)"
 
     _ic_oce2pism_anoforce_addition_regridded \
         ${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc \
@@ -1050,11 +1035,8 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
         ${REFERENCE_OCEAN_VNAME_TEMP_OCEAN:?Miss Var 5} \
         ${OCEAN_TEMP_LOWER_THRESHOLD:?Miss Var 6}
 
-    #todo:rm
     if [ ! -f ${PISM_OCEAN_FORCING_FILE} ] ; then
         echo "ERROR: Missing output file ${PISM_OCEAN_FORCING_FILE}"
-        echo "S T O P"  #todo:delete
-        exit 3
     fi
 }
 
@@ -1068,8 +1050,6 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
 ic_oce2pism_anoforce_offset_salt_oce_regridded() {
     echo""; echo -e "\t\t*   anomaly ocean salinity evolution (offset)"
 
-    #todo:old:rm:mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
-    #todo:old:rm:   ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc
     mv ${PISM_OCEAN_FORCING_FILE} \
        ${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc
 
@@ -1083,11 +1063,8 @@ ic_oce2pism_anoforce_offset_salt_oce_regridded() {
         ${REFERENCE_OCEAN_VNAME_SALT_OCEAN?Miss Var 5} \
         ${OCEAN_SALT_LOWER_THRESHOLD:?Miss Var 6}
 
-    #todo:rm
     if [ ! -f ${PISM_OCEAN_FORCING_FILE} ] ; then
         echo "ERROR: Missing output file ${PISM_OCEAN_FORCING_FILE}"
-        echo "S T O P"  #todo:delete
-        exit 3
     fi
 }
 
@@ -1110,12 +1087,10 @@ _ic_oce2pism_anoforce_addition_regridded() {
     #
     # Check existences of input files
     #
-    echo "_ic_oce2pism_anoforce_addition_regridded : $*" #todo:rm:
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
         if [ ! -f $_file ] ; then
+	    echo "_ic_oce2pism_anoforce_addition_regridded, INPUT: $*"
             echo "ERROR: Missing input file $_file"
-            echo "S T O P"      #todo:delete
-            exit 3
         fi
     done
     # In case $_input and $_output are identical
@@ -1132,6 +1107,13 @@ _ic_oce2pism_anoforce_addition_regridded() {
         -sub -selvar,$_force_var $_input_force_file \
              -selvar,$_base_state_force_var $_base_state_force_file \
         $_output_force_file
+
+    #
+    # Add all remaining unchanged variables from the input forcing file
+    # to the output forcing file. It is needed because the ocean file
+    # may contain several fields, such as ocean temperature and salinity.
+    #
+    ncks -A -xv $_force_var $_input_force_file $_output_force_file
 }
 
 
