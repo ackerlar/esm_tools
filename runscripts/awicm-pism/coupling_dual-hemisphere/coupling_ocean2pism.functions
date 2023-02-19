@@ -998,7 +998,10 @@ ic_oce2pism_anoforce_initialize(){
     #todo: rm
     echo " ------------------------------------------------------------------"
     pwd
-    ls
+    ls -l
+    echo " ------------------------------------------------------------------"
+    echo ${COUPLE_DIR}/${PISM_HEMISPHERE}/
+    ls -l ${COUPLE_DIR}/${PISM_HEMISPHERE}/
     echo " ------------------------------------------------------------------"
 
     #
@@ -1028,15 +1031,18 @@ ic_oce2pism_anoforce_initialize(){
 ic_oce2pism_anoforce_offset_temp_oce_regridded(){
     echo""; echo -e "\t\t*   anomaly ocean temperature evolution (offset)"
 
-    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
-       ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc
+    #todo:old:rm:mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+    #todo:old:rm:   ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc
+
+    mv ${PISM_OCEAN_FORCING_FILE} \
+       ${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc
 
         #todo:delete
-        echo " OCEAN forcing file $(cdo -s showvar ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc)"
+        echo " OCEAN forcing file $(cdo -s showvar ${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc)"
 
     _ic_oce2pism_anoforce_addition_regridded \
-        ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc \
-        ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+        ${PISM_OCEAN_FORCING_FILE}.NoTempAno.nc \
+        ${PISM_OCEAN_FORCING_FILE} \
         ${FORCING_OCEAN_VNAME_TEMP_OCEAN:?Miss Var 1} \
         ${BASE_STATE_OCEAN_FNAME:?Miss Var 2} \
         ${BASE_STATE_OCEAN_VNAME_TEMP_OCEAN:?Miss Var 3} \
@@ -1045,8 +1051,8 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
         ${OCEAN_TEMP_LOWER_THRESHOLD:?Miss Var 6}
 
     #todo:rm
-    if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} ] ; then
-        echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}"
+    if [ ! -f ${PISM_OCEAN_FORCING_FILE} ] ; then
+        echo "ERROR: Missing output file ${PISM_OCEAN_FORCING_FILE}"
         echo "S T O P"  #todo:delete
         exit 3
     fi
@@ -1062,12 +1068,14 @@ ic_oce2pism_anoforce_offset_temp_oce_regridded(){
 ic_oce2pism_anoforce_offset_salt_oce_regridded() {
     echo""; echo -e "\t\t*   anomaly ocean salinity evolution (offset)"
 
-    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
-       ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc
+    #todo:old:rm:mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+    #todo:old:rm:   ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc
+    mv ${PISM_OCEAN_FORCING_FILE} \
+       ${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc
 
     _ic_oce2pism_anoforce_addition_regridded \
-        ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc \
-        ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} \
+        ${PISM_OCEAN_FORCING_FILE}.NoSaltAno.nc \
+        ${PISM_OCEAN_FORCING_FILE} \
         ${FORCING_OCEAN_VNAME_SALT_OCEAN:?Miss Var 1} \
         ${BASE_STATE_OCEAN_FNAME:?Miss Var 2} \
         ${BASE_STATE_OCEAN_VNAME_SALT_OCEAN:?Miss Var 3} \
@@ -1076,8 +1084,8 @@ ic_oce2pism_anoforce_offset_salt_oce_regridded() {
         ${OCEAN_SALT_LOWER_THRESHOLD:?Miss Var 6}
 
     #todo:rm
-    if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE} ] ; then
-        echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/${PISM_OCEAN_FORCING_FILE}"
+    if [ ! -f ${PISM_OCEAN_FORCING_FILE} ] ; then
+        echo "ERROR: Missing output file ${PISM_OCEAN_FORCING_FILE}"
         echo "S T O P"  #todo:delete
         exit 3
     fi
