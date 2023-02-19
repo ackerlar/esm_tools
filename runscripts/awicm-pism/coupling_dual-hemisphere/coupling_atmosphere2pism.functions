@@ -2062,9 +2062,6 @@ ic_atm2pism_anoforce_offset_temp_air_regridded() {
         mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
            ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc
 
-        #todo:delete
-        echo " temperature.nc $(cdo -s showvar ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc)"
-
         _ic_atm2pism_anoforce_addition_regridded \
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.NoAnomaly.nc \
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
@@ -2074,11 +2071,8 @@ ic_atm2pism_anoforce_offset_temp_air_regridded() {
             ${REFERENCE_ATMOS_FNAME:?Miss var 4} \
             ${REFERENCE_ATMOS_VNAME_TEMP_AIR:?Miss var 5}
 
-        #todo:rm
         if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc ] ; then
             echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc"
-            echo "S T O P"      #todo:delete
-            exit 3
         fi
 }
 
@@ -2094,9 +2088,6 @@ ic_atm2pism_anoforce_offset_temp_firn_regridded() {
         echo""; echo -e "\t\t*   anomaly firn temperature evolution (offset)"
         mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
            ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.NoAnomaly.nc
-
-        #todo:delete
-        echo " temperature.nc $(cdo -s showvar ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.NoAnomaly.nc)"
 
         _ic_atm2pism_anoforce_addition_regridded \
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.NoAnomaly.nc \
@@ -2118,11 +2109,8 @@ ic_atm2pism_anoforce_offset_temp_firn_regridded() {
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
             && rm -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.tmp.nc
 
-        #todo:rm
         if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc ] ; then
             echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc"
-            echo "S T O P"      #todo:delete
-            exit 3
         fi
 }
 
@@ -2148,11 +2136,8 @@ ic_atm2pism_anoforce_offset_precipitation_regridded() {
             ${REFERENCE_ATMOS_FNAME:?Miss var 5} \
             ${REFERENCE_ATMOS_VNAME_PRECIP:?Miss var 6}
 
-        #todo:rm
         if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc ] ; then
             echo "ERROR: Missing output file ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc"
-            echo "S T O P"      #todo:delete
-            exit 3
         fi
 }
 
@@ -2196,12 +2181,10 @@ _ic_atm2pism_anoforce_addition_regridded() {
     #
     # Check existences of input files
     #
-    echo "_ic_atm2pism_anoforce_addition_regridded : $*" #todo:rm:
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
         if [ ! -f $_file ] ; then
+	    echo "_ic_atm2pism_anoforce_addition_regridded, INPUT: $*"
             echo "ERROR: Missing input file $_file"
-            echo "S T O P"      #todo:delete
-            exit 3
         fi
     done
     # In case $_input and $_output are identical
@@ -2241,12 +2224,11 @@ _ic_atm2pism_anoforce_multiplication_regridded() {
     #
     # Check existences of input files
     #
-    echo "_ic_atm2pism_anoforce_multiplication_regridded : $*" #todo:rm:
+
     for _file in $_input_force_file $_base_state_force_file  $_reference_file ; do
         if [ ! -f $_file ] ; then
+	    echo "_ic_atm2pism_anoforce_multiplication_regridded, INPUT: $*"
             echo "ERROR: Missing input file $_file"
-            echo "S T O P"      #todo:delete
-            exit 3
         fi
     done
     # In case $_input and $_output are identical
