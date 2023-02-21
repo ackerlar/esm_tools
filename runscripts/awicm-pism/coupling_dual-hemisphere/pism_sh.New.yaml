@@ -31,10 +31,10 @@ pism_sh:
         lapse_rate: -0.005
         iceberg_coupling: False
         # Anomaly coupling
-        #todo:4test:ANOMALY_AIR_TEMPERATURE: True
-        #todo:4test:ANOMALY_PRECIPITATION: True
-        #todo:4test:ANOMALY_OCEAN_TEMPERATURE: True
-        #todo:4test:ANOMALY_OCEAN_SALINITY: True
+        ANOMALY_AIR_TEMPERATURE: True
+        ANOMALY_PRECIPITATION: True
+        ANOMALY_OCEAN_TEMPERATURE: True
+        ANOMALY_OCEAN_SALINITY: True
         ###################
 
         ini_parent_exp_id: "bla"
