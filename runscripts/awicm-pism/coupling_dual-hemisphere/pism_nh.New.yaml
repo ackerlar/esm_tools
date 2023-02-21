@@ -21,6 +21,8 @@ pism_nh:
 
         ###################
         # Settings for AWIES - PISM coupling
+        # Ocean ablation methode
+        ocean_ablation_method: "OCEANTEMPSALT"
         # DEBM
         ablation_method: "DEBM"
         debm_path: "/home/a/a270124/dEBM/Fortran-v1.0/dEBMmain"
