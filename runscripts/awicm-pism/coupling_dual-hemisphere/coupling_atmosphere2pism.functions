@@ -441,7 +441,8 @@ ic_atm2pism_prepare_clean_missing_values() {
     echo; echo -e "\t\t* Cleaning up missing values from atmosphere_file_for_ice.nc (If any are found)"
 
     missing_value_filler=0
-    variables_in_atmosphere_file_for_ice=$(cdo -s vardes ${COUPLE_DIR}/atmosphere_file_for_ice.nc | tr -s ' ' | awk '{print $2}')
+    #todo:org:old variables_in_atmosphere_file_for_ice=$(cdo -s vardes ${COUPLE_DIR}/atmosphere_file_for_ice.nc | tr -s ' ' | awk '{print $2}')
+    variables_in_atmosphere_file_for_ice=$(cdo -s showvar ${COUPLE_DIR}/atmosphere_file_for_ice.nc)
     cdo -s splitvar ${COUPLE_DIR}/atmosphere_file_for_ice.nc ${COUPLE_DIR}/atmosphere_file_for_ice_
     for var in ${variables_in_atmosphere_file_for_ice}; do
         current_min=$(cdo -s \
@@ -526,7 +527,8 @@ ic_atm2pism_regrid_dyn_downscale_generate_elevation_difference() {
         fi
         #INPUT_FILE_NAME_BASE_pism=$(basename ${INPUT_FILE_pism:?Missing variable})
         INPUT_FILE_NAME_BASE_pism=${INPUT_FILE_pism}
-        if ${cdo} -L -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
+        #TODO:org:rm:if ${cdo} -L -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
+	if [ $(${cdo} -s showvar ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep usurf | wc -l) -gt 0 ] ; then
                 echo ""; echo "                *  using INPUT_FILE_pism = ${INPUT_FILE_pism}"
                 ${cdo} -s -selvar,usurf ${INPUT_FILE_pism} usurf.tmp.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
                 ${cdo} -s -seltimestep,-1 usurf.tmp.nc "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
@@ -670,8 +672,8 @@ ic_atm2pism_regrid_downscale_split_names() {
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmosphere_file_for_ice_for_downscaling_ 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
         ##atmosphere_file_at_ice.${INTERPOL_TYPE_ATM}.nc # && rm atmosphere_file_for_ice.nc
 
-        for varname in $(cdo -s vardes ${COUPLE_DIR}/atmosphere_file_for_ice.nc | tr -s ' ' | awk -F ' ' '{print $2}'); do
-        #for varname in $(cdo -s showvar ${COUPLE_DIR}/atmosphere_file_for_ice.nc | tr -s ' ' | awk -F ' ' '{print $2}'); do
+        #todo:org:rm:for varname in $(cdo -s vardes ${COUPLE_DIR}/atmosphere_file_for_ice.nc | tr -s ' ' | awk -F ' ' '{print $2}'); do
+        for varname in $(cdo -s showvar ${COUPLE_DIR}/atmosphere_file_for_ice.nc); do
                 cleanup_list="$cleanup_list ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmosphere_file_for_ice_for_downscaling_${varname}.nc"
         done
 }
@@ -694,7 +696,8 @@ ic_atm2pism_regrid_downscale_generate_elevation_difference() {
         fi
         #INPUT_FILE_NAME_BASE_pism=$(basename ${INPUT_FILE_pism:?Missing variable})
         INPUT_FILE_NAME_BASE_pism=${INPUT_FILE_pism}
-        if ${cdo} -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
+        #todo:org:rm:if ${cdo} -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
+	if [ $(${cdo} -s showvar ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep usurf | wc -l) -gt 0 ] ; then
                 ${cdo} -s -seltimestep,-1 ${INPUT_FILE_pism} usurf.tmp.nc
                 ${cdo} -s -selvar,usurf usurf.tmp.nc "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
                 elev_hi_file="${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc
