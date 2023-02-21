@@ -527,15 +527,15 @@ ic_atm2pism_regrid_dyn_downscale_generate_elevation_difference() {
         fi
         #INPUT_FILE_NAME_BASE_pism=$(basename ${INPUT_FILE_pism:?Missing variable})
         INPUT_FILE_NAME_BASE_pism=${INPUT_FILE_pism}
-        #TODO:org:rm:if ${cdo} -L -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
-	if [ $(${cdo} -s showvar ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep usurf | wc -l) -gt 0 ] ; then
+        #TODO:org:rm:if $cdo -L -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
+	if [ $($cdo -s showvar ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep usurf | wc -l) -gt 0 ] ; then
                 echo ""; echo "                *  using INPUT_FILE_pism = ${INPUT_FILE_pism}"
-                ${cdo} -s -selvar,usurf ${INPUT_FILE_pism} usurf.tmp.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-                ${cdo} -s -seltimestep,-1 usurf.tmp.nc "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-                #${cdo} -s -seltimestep,-1 -selvar,usurf ${INPUT_FILE_pism} "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+                $cdo -s -selvar,usurf ${INPUT_FILE_pism} usurf.tmp.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+                $cdo -s -seltimestep,-1 usurf.tmp.nc "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+                #$cdo -s -seltimestep,-1 -selvar,usurf ${INPUT_FILE_pism} "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
                 elev_hi_file="${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc
         else
-                ${cdo} -s -add \
+                $cdo -s -add \
                         -selvar,thk ${INPUT_FILE_pism} \
                         -setrtoc,-10000,0,0 \
                         -selvar,topg ${INPUT_FILE_pism} \
@@ -545,7 +545,7 @@ ic_atm2pism_regrid_dyn_downscale_generate_elevation_difference() {
         fi
         mv $elev_hi_file ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc
         cp ${COUPLE_DIR}/atmosphere_file_for_ice_for_downscaling_${atmosphere_name_elevation}.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc
-        ${cdo} -s sub ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+        $cdo -s sub ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
         ncrename -v $atmosphere_name_elevation,usurf ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/tmp.nc
         cdo settbounds,1mon -setreftime,1850-01-01,00:00:00 -setunit,m tmp.nc surface_altitude_coarse_resolution.nc
 
@@ -696,14 +696,14 @@ ic_atm2pism_regrid_downscale_generate_elevation_difference() {
         fi
         #INPUT_FILE_NAME_BASE_pism=$(basename ${INPUT_FILE_pism:?Missing variable})
         INPUT_FILE_NAME_BASE_pism=${INPUT_FILE_pism}
-        #todo:org:rm:if ${cdo} -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
-	if [ $(${cdo} -s showvar ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep usurf | wc -l) -gt 0 ] ; then
-                ${cdo} -s -seltimestep,-1 ${INPUT_FILE_pism} usurf.tmp.nc
-                ${cdo} -s -selvar,usurf usurf.tmp.nc "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+        #todo:org:rm:if $cdo -s vardes ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep -q usurf; then
+	if [ $($cdo -s showvar ${INPUT_FILE_pism} 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism | grep usurf | wc -l) -gt 0 ] ; then
+                $cdo -s -seltimestep,-1 ${INPUT_FILE_pism} usurf.tmp.nc
+                $cdo -s -selvar,usurf usurf.tmp.nc "${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
                 elev_hi_file="${INPUT_FILE_NAME_BASE_pism%.*}"_usurf.nc
         else
                 echo " * LA DEBUG: INPUT_FILE_pism = ${INPUT_FILE_pism}"
-                ${cdo} -s -add \
+                $cdo -s -add \
                         -selvar,thk ${INPUT_FILE_pism} \
                         -setrtoc,-10000,0,0 \
                         -selvar,topg ${INPUT_FILE_pism} \
@@ -712,15 +712,15 @@ ic_atm2pism_regrid_downscale_generate_elevation_difference() {
         fi
         mv $elev_hi_file ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc
         cp ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmosphere_file_for_ice_for_downscaling_${atmosphere_name_elevation}.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc
-        ${cdo} -s sub ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+        $cdo -s sub ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
         #UKK generate elevation differences for desertification scheme
         #the idea is to prevent that the ice sheet grows unlimited, if the HR (high res
         #resolution) ice sheet exceeds the height of the LR ice sheet and gets too
         #high precipitation rates, due to the lower topography in the LR atmosphere.
         #this scheme is only active on HR heights >2000m.
-        ${cdo} -maxc,2000   ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_2000.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-        ${cdo} -maxc,2000   ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo_2000.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-        ${cdo} -s -maxc,0 -sub ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_2000.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo_2000.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo_2000.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+        $cdo -maxc,2000   ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_2000.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+        $cdo -maxc,2000   ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo_2000.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+        $cdo -s -maxc,0 -sub ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_2000.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo_2000.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo_2000.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
 
         cleanup_list="$cleanup_list ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_lo.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo.nc usurf.tmp.nc"
 }
@@ -764,7 +764,7 @@ ic_atm2pism_regrid_downscale_temperature() {
                         exit 6
                 fi
                 echo "                -  Lapse rate applied was gamma=${DOWNSCALING_LAPSE_RATE} (K/km)"
-                ${cdo} -s -f nc \
+                $cdo -s -f nc \
                         -add ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmosphere_file_for_ice_for_downscaling_${atmosphere_name_temperature}.nc \
                         -mulc,${DOWNSCALING_LAPSE_RATE} \
                         ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo.nc \
@@ -794,7 +794,7 @@ ic_atm2pism_regrid_downscale_temperature_below_firn() {
                         exit 6
                 fi
                 echo "                -  Lapse rate applied was Γ=${DOWNSCALING_LAPSE_RATE} (K/km)"
-                ${cdo} -s -f nc \
+                $cdo -s -f nc \
                         -add ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmosphere_file_for_ice_for_downscaling_${atmosphere_name_temperature_below_firn}.nc \
                         -mulc,${DOWNSCALING_LAPSE_RATE} \
                         ${COUPLE_DIR}/${PISM_HEMISPHERE}/elev_hi_minus_lo.nc \
@@ -839,7 +839,7 @@ ic_atm2pism_regrid_downscale_precipitation() {
                 gamma="-0.07"
                 echo -e "\t\t-  factor γ=${gamma}"
                 echo -e "\t\t-  P_downscaled = P * e ** (gamma * (T_downscaled - T_original))"
-                ${cdo} -s \
+                $cdo -s \
                         -mul \
                         ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmosphere_file_for_ice_for_downscaling_${atmosphere_name_precipitation}.nc \
                         -exp \
@@ -865,7 +865,7 @@ ic_atm2pism_regrid_downscale_precipitation() {
                 echo -e "\t\t-  factor γ=${gamma}"
                 echo -e "\t\t-  P_downscaled = P * e ** (-gamma * max(0,(max(2000,Z_hi) - max(2000,Z_lo))))"
 
-                ${cdo} -s \
+                $cdo -s \
                         -mul \
                         ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmosphere_file_for_ice_for_downscaling_${atmosphere_name_precipitation}.nc \
                         -exp \
@@ -940,14 +940,14 @@ ic_atm2pism_regrid_interpolate_temperature() {
 
         if [ "x$debug_ic_atm2pism_regrid_interpolate_temperature" == "x1" ]; then
                 echo -e "\t\t Command is:"
-                echo " ${cdo} -v -f nc -P 8 \
+                echo " $cdo -v -f nc -P 8 \
                         -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                         -selvar,${atmosphere_name_temperature} \
                         ${atmosphere_file} ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
                         2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism"
         fi
 
-        ${cdo} -s -f nc -P 8 \
+        $cdo -s -f nc -P 8 \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                 -selvar,${atmosphere_name_temperature} \
                 ${atmosphere_file} \
@@ -960,14 +960,14 @@ ic_atm2pism_regrid_interpolate_temperature_below_firn() {
 
         if [ "x$debug_ic_atm2pism_regrid_interpolate_temperature_below_firn" == "x1" ]; then
                 echo -e "\t\t Command is:"
-                echo " ${cdo} -v -f nc -P 8 \
+                echo " $cdo -v -f nc -P 8 \
                         -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                         -selvar,${atmosphere_name_temperature_below_firn} \
                         ${atmosphere_file} ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
                         2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism"
         fi
 
-        ${cdo} -s -f nc -P 8 \
+        $cdo -s -f nc -P 8 \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                 -selvar,${atmosphere_name_temperature_below_firn} \
                 ${atmosphere_file} \
@@ -982,7 +982,7 @@ ic_atm2pism_regrid_interpolate_temperature_below_firn() {
 ## This is the fallback option if downscaling only is applied to temperature.
 ic_atm2pism_regrid_interpolate_precipitation() {
         echo ""; echo -e "\t\t* Regridding precipitation bilinearly from atmosphere_file_for_ice.nc"
-        ${cdo} -v -f nc  -P 8 \
+        $cdo -v -f nc  -P 8 \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                 -selvar,${atmosphere_name_precipitation} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -992,7 +992,7 @@ ic_atm2pism_regrid_interpolate_precipitation() {
 
 ic_atm2pism_regrid_interpolate_shortwave_downward_radiation() {
         echo ""; echo -e "\t\t* Regridding short-wave downward radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_shortwave} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1002,7 +1002,7 @@ ic_atm2pism_regrid_interpolate_shortwave_downward_radiation() {
 
 ic_atm2pism_regrid_interpolate_longwave_downward_radiation() {
         echo ""; echo -e "\t\t* Regridding long-wave downward radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_longwave} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1010,7 +1010,7 @@ ic_atm2pism_regrid_interpolate_longwave_downward_radiation() {
 }
 ic_atm2pism_regrid_interpolate_TOAshortwave() {
         echo ""; echo -e "\t\t* Regridding from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_TOAshortwave} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1018,7 +1018,7 @@ ic_atm2pism_regrid_interpolate_TOAshortwave() {
 }
 ic_atm2pism_regrid_interpolate_emissivity() {
         echo ""; echo -e "\t\t* Regridding from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_emissivity} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1027,7 +1027,7 @@ ic_atm2pism_regrid_interpolate_emissivity() {
 
 ic_atm2pism_regrid_interpolate_humidity() {
         echo ""; echo -e "\t\t* Regridding from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_humidity} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1036,7 +1036,7 @@ ic_atm2pism_regrid_interpolate_humidity() {
 
 ic_atm2pism_regrid_interpolate_transmissivity() {
         echo ""; echo -e "\t\t* Regridding from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_transmissivity} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1045,7 +1045,7 @@ ic_atm2pism_regrid_interpolate_transmissivity() {
 
 ic_atm2pism_regrid_interpolate_cloud_cover() {
         echo ""; echo -e "\t\t* Regridding cloud cover downward radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_cloud_cover} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1065,7 +1065,7 @@ ic_atm2pism_regrid_interpolate_cloud_cover() {
 ## Conservative remapping for temperature to ice grid
 ic_atm2pism_regrid_remap_temperature() {
         echo ""; echo -e "\t\t* Regridding temperature conservatively from atmosphere_file_for_ice.nc"
-        ${cdo} -s -f nc  \
+        $cdo -s -f nc  \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                 -selvar,${atmosphere_name_temperature} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1074,7 +1074,7 @@ ic_atm2pism_regrid_remap_temperature() {
 
 ic_atm2pism_regrid_remap_temperature_below_firn() {
         echo ""; echo -e "\t\t* Regridding temperature_below_firn conservatively from atmosphere_file_for_ice.nc"
-        ${cdo} -s -f nc  \
+        $cdo -s -f nc  \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                 -selvar,${atmosphere_name_temperature_below_firn} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1086,7 +1086,7 @@ ic_atm2pism_regrid_remap_temperature_below_firn() {
 ## Conservative remapping for precipitation to ice grid
 ic_atm2pism_regrid_remap_precipitation() {
         echo ""; echo -e "\t\t* Regridding precipitation conservatively from atmosphere_file_for_ice.nc"
-        ${cdo} -s -f nc  \
+        $cdo -s -f nc  \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                 -selvar,${atmosphere_name_precipitation} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1095,7 +1095,7 @@ ic_atm2pism_regrid_remap_precipitation() {
 
 ic_atm2pism_regrid_remap_shortwave_downward_radiation() {
         echo ""; echo -e "\t\t* Regridding short-wave downward radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_shortwave} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1105,7 +1105,7 @@ ic_atm2pism_regrid_remap_shortwave_downward_radiation() {
 
 ic_atm2pism_regrid_remap_longwave_downward_radiation() {
         echo ""; echo -e "\t\t* Regridding long-wave downward radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_longwave} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1114,7 +1114,7 @@ ic_atm2pism_regrid_remap_longwave_downward_radiation() {
 
 ic_atm2pism_regrid_remap_TOAshortwave() {
         echo ""; echo -e "\t\t* Regridding TOA shortwave radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_TOAshortwave} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1122,7 +1122,7 @@ ic_atm2pism_regrid_remap_TOAshortwave() {
 }
 ic_atm2pism_regrid_remap_emissivity() {
         echo ""; echo -e "\t\t* Regridding TOA shortwave radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_emissivity} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1130,7 +1130,7 @@ ic_atm2pism_regrid_remap_emissivity() {
 }
 ic_atm2pism_regrid_remap_humidity() {
         echo ""; echo -e "\t\t* Regridding TOA shortwave radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_humidity} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1138,7 +1138,7 @@ ic_atm2pism_regrid_remap_humidity() {
 }
 ic_atm2pism_regrid_remap_transmissivity() {
         echo ""; echo -e "\t\t* Regridding TOA shortwave radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_transmissivity} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1146,7 +1146,7 @@ ic_atm2pism_regrid_remap_transmissivity() {
 }
 ic_atm2pism_regrid_remap_cloud_cover() {
         echo ""; echo -e "\t\t* Regridding cloud cover downward radiation from atmosphere_file_for_ice.nc"
-        ${cdo} -f nc \
+        $cdo -f nc \
                 -remapcon,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 -selvar,${atmosphere_name_cloud_cover} \
                 ${COUPLE_DIR}/atmosphere_file_for_ice.nc \
@@ -1206,7 +1206,7 @@ ic_atm2pism_ablation_pdd_set_precipitation_units() {
                 #
                 # Divide by ice density and convert from kg/m^2s to mm/day ice equivalent
                 # Next step is skipped if we use pism1.0, then pism wants kg m-2 s-1
-                ${cdo} -s \
+                $cdo -s \
                         -mulc,3600 -mulc,24 -mulc,1000 -divc,910 \
                         ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
                         tmp \
@@ -1240,7 +1240,7 @@ ic_atm2pism_ablation_pdd_set_precipitation_units() {
 
 ic_atm2pism_ablation_pdd_merge_preliminary_files() {
         echo -e "\t\t- merging atmospheric temp and precip together"
-        ${cdo} -s -O \
+        $cdo -s -O \
                 -merge \
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
@@ -1258,7 +1258,7 @@ ic_atm2pism_ablation_pdd_set_time_axis() {
 
         echo -e "\t\t- appending time axis to forcing file >>${COUPLE_DIR}/${PISM_HEMISPHERE}/atmo_given_file.nc<<"
         # Determine how many timesteps we have and set time unit accordingly
-        nt=$(${cdo} -s ntime ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmo_given_file.nc)
+        nt=$($cdo -s ntime ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmo_given_file.nc)
         if [ "x$nt" == "x1" ]; then
                 echo -e "\t\t- only ONE timestep given"
                 time_unit="year"
@@ -1413,7 +1413,7 @@ ic_atm2debm_ablation_debm_make_forcing_set_temperature_units() {
             if [[ "x${REDUCE_TEMP_BY}" == "xanom" ]]; then
                 echo -e "\t\t-  use bias correction from this file ${TEMP2_BIAS_FILE}"
 
-                ${cdo} -s -f nc -P 8 \
+                $cdo -s -f nc -P 8 \
                         -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                         ${TEMP2_BIAS_FILE} \
                         ${COUPLE_DIR}/${PISM_HEMISPHERE}/remapped.temp2bias_file.nc
@@ -1447,11 +1447,11 @@ ic_atm2debm_ablation_debm_make_forcing_set_precipitation_units() {
         if [[ "x${PREC_ANOM}" == "x1" ]]; then
              echo -e "\t\t-  use bias correction from this file ${PREC_BIAS_FILE}"
 
-             ${cdo} -s -f nc -P 8 \
+             $cdo -s -f nc -P 8 \
                      -remapbil,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes   \
                      ${PREC_BIAS_FILE} \
                      ${COUPLE_DIR}/${PISM_HEMISPHERE}/remapped.precbias_file.nc
-             ${cdo} -s -P 8 \
+             $cdo -s -P 8 \
                     -setmisstoc,0
                     -ifthen -gtc,0 ${COUPLE_DIR}/${PISM_HEMISPHERE}/remapped.precbias_file.nc
                     ${COUPLE_DIR}/${PISM_HEMISPHERE}/remapped.precbias_file.nc tmp.nc
@@ -1939,7 +1939,7 @@ ic_debm2pism_ablation_debm_make_surface_forcing_set_time_axis() {
         echo -e "\t\t- Adding a time axis"
 
         # Determine how many timesteps we have and set time unit accordingly
-        nt=$(${cdo} -s ntime ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc)
+        nt=$($cdo -s ntime ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc)
         if [ "x$nt" == "x1" ]; then
                 echo "                 -   only ONE timestep given"
                 time_unit="year"
