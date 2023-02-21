@@ -49,7 +49,8 @@ pism_nh:
         ini_parent_date: "1-1-1"
         ini_restart_dir: "bla"
         #CCR spinup_file: Start at time0
-        spinup_file: "/work/ba0989/a270124/PalModII/experiments/_old/PI_bootstrap/restart/pism/PI_bootstrap_pismr_restart_10000101-10091231.nc"
+        #TODO#old#spinup_file: "/work/ba0989/a270124/PalModII/experiments/_old/PI_bootstrap/restart/pism/PI_bootstrap_pismr_restart_10000101-10091231.nc"
+        spinup_file: "/work/ba1347/PISM/initial/NHEM/PI_bootstrap_pismr_restart_10000101-10091231.nc"
         pool_dir: "/work/ba1066/a270124/pool_pism/"
         ts_interval: "1"
         ex_interval: "monthly"
