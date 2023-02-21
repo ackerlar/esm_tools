@@ -52,7 +52,8 @@ def prepare_environment(config):
             "ANOMALY_OCEAN_TEMPERATURE": int(config[config["general"]["setup_name"]].get("ANOMALY_OCEAN_TEMPERATURE", 0)),
             "ANOMALY_OCEAN_SALINITY": int(config[config["general"]["setup_name"]].get("ANOMALY_OCEAN_SALINITY", 0)),
             #todo#Nee#rm#"PISM_OCEAN_PICO_BASINS_FILE": config[config["general"]["setup_name"]].get("PICO_basins_only_file", "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"),
-            "PISM_OCEAN_PICO_BASINS_FILE": config[config["general"]["setup_name"]]["PICO_basins_only_file"],
+            "PISM_OCEAN_PICO_BASINS_FILE": config[config["general"]["setup_name"]].get("PICO_basins_only_file", config["general"]["setup_name"]+"/latest_ocean_forcing_file.nc"),
+            #todo#crash#?#"PISM_OCEAN_PICO_BASINS_FILE": config[config["general"]["setup_name"]]["PICO_basins_only_file"],
             #TODO#delete#"PISM_OCEAN_PICO_BASINS_FILE": "/home/ollie/lackerma/pool_pism/basins/antarctica.16km.nc",
 
             #"RESTART_DIR_pism": config[config["general"]["setup_name"]]["experiment_restart_in_dir"],
