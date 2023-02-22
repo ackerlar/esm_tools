@@ -336,7 +336,7 @@ set_glacial_mask_echam_restart_file_2nd() {
         #mv echam_with_ice_mask.nc ${ECHAM_RESTART_FILE}
 	[ -f ${ECHAM_RESTART_FILE} ] && mv -f ${ECHAM_RESTART_FILE} ${ECHAM_RESTART_FILE}~
         ncatted -a history_of_appended_files,global,d,, \
-		-a history,global,d,,
+		-a history,global,d,, \
 		-a command,global,d,, \
 		-a source,global,d,, \
 		echam_with_ice_mask.nc ${ECHAM_RESTART_FILE} \
