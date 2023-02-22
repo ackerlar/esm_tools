@@ -34,7 +34,7 @@ def prepare_environment(config):
             #CCR:Future:"iter_coup_interact_method_ice2oce": "BASALSHELF_WATER_ICEBERG_WATERHEAT",
             #CCR:Future:"iter_coup_interact_method_oce2ice": "PICO_OCEAN",
             "iter_coup_interact_method_ice2oce": "BASALSHELF_WATER_ICEBERG_MODEL",
-            "iter_coup_interact_method_oce2ice": config[config["general"]["setup_name"]].get("regrid_method", "OCEANTEMPSALT"),
+            "iter_coup_interact_method_oce2ice": config[config["general"]["setup_name"]].get("ocean_ablation_method", "OCEANTEMPSALT"),
             "MACHINE": config["computer"]["name"],
             "DOMAIN_pism": config[config["general"]["setup_name"]]["domain"],
             "RES_pism": config[config["general"]["setup_name"]]["resolution"],
