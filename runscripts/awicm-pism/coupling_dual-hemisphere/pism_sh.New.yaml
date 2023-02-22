@@ -72,9 +72,9 @@ pism_sh:
                 #TODO#basal_yield_stress.mohr_coulomb.till_cohesion: 0
                 #TODO#basal_yield_stress.mohr_coulomb.till_compressibility_coefficient: 0.12
                 #TODO#hydrology.tillwat_max: 1
-                hydrology: null
+                hydrology: "null"
                 bed_deformation.model: "lc"
-                calving.methods: 'eigen_calving,thickness_calving'
+                calving.methods: "eigen_calving,thickness_calving"
                 #TODO#16km#calving.thickness_calving.threshold: 100
                 #TODO#16km#eigen_calving_K: 1.0e18
                 #TODO#16km#geometry.front_retreat.prescribed.file: "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
@@ -113,10 +113,9 @@ pism_sh:
                         files:
                             atmosphere_given_file: "latest_atmo_forcing_file.nc"
                 ocean:
-                    th:
-                        files:
-                            ocean_th_file: "latest_ocean_forcing_file.nc"
-                ocean:
+                    #Not_here#th:
+                    #Not_here#    files:
+                    #Not_here#        ocean_th_file: "latest_ocean_forcing_file.nc"
                     pico:
                         files:
                             ocean_pico_file: "latest_ocean_forcing_file.nc"
