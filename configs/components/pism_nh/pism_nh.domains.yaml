@@ -3,6 +3,20 @@ lz: 5750
 lbz: 2000
 
 choose_domain:
+        "antarct_cr":
+                choose_resolution:
+                        16km:
+                            nx: 381
+                            ny: 381
+                            nz: 75
+                            bz: 21
+                            grid_edge: 16
+                        8km:
+                            nx: 761
+                            ny: 761
+                            nz: 166
+                            bz: 21
+                            grid_edge: 8
         "antarctica":
                 choose_resolution:
                         32km:
@@ -66,6 +80,23 @@ choose_domain:
                                 ny: 561
                                 nz: 201
                                 bz: 21
+                                grid_edge: 5
+        "gris_nhem":
+                lz: 4500
+                choose_resolution:
+                        10km:
+                                lz: 4500
+                                nx: 161
+                                ny: 291
+                                nz: 151
+                                bz: 11
+                                grid_edge: 10
+                        5km:
+                                lz: 4500
+                                nx: 321
+                                ny: 581
+                                nz: 151
+                                bz: 11
                                 grid_edge: 5
         "laurentide":
                 choose_resolution:
