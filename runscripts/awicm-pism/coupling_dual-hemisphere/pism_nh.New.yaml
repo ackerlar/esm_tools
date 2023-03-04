@@ -76,7 +76,7 @@ pism_nh:
                 ocean.pik_melt_factor: "1e-2"
                 atmosphere.elevation_change.precip_lapse_rate: 0.0
                 atmosphere.elevation_change.smb_lapse_rate: 0.0
-                # PICO switches CCR
+                # PICO switches
 
         flags:
                 #- "bootstrap"

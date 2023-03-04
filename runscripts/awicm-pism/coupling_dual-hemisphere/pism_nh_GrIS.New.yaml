@@ -14,8 +14,8 @@ general:
 
 pism_nh:
         version: "github1.2.1"
-        resolution: "10km"
-        #ccr:new:resolution: "5km"
+        #:org:nhem:resolution: "10km"
+        resolution: "5km"
         # model_dir: "/home/a/a270096/pism_dependencies/pism-1.1.4-qoohpi/"
         model_dir: "/home/a/a270124/pism_dependencies/pism-1.1.4-qoohpi/"
         lresume: 1
@@ -51,13 +51,13 @@ pism_nh:
         ini_restart_dir: "bla"
         #CCR spinup_file: Start at time0
         #TODO#old#spinup_file: "/work/ba0989/a270124/PalModII/experiments/_old/PI_bootstrap/restart/pism/PI_bootstrap_pismr_restart_10000101-10091231.nc"
-        #ccr:new:spinup_file: "/work/ba1347/PISM/initial/GrIS_nhem/GrIS_bootstrap_pismr_restart_05km.nc"
-        spinup_file: "/work/ba1347/PISM/initial/NHEM/PI_bootstrap_pismr_restart_10000101-10091231.nc"
+        #:org:nhem:spinup_file: "/work/ba1347/PISM/initial/NHEM/PI_bootstrap_pismr_restart_10000101-10091231.nc"
+        spinup_file: "/work/ba1347/PISM/initial/GrIS_nhem/GrIS_bootstrap_pismr_restart_05km.nc"
         pool_dir: "/work/ba1066/a270124/pool_pism/"
         ts_interval: "1"
         ex_interval: "monthly"
-        #ccr:new:domain: "gris_nhem"
-        domain: "nhem"
+        #:org:nhem:domain: "nhem"
+        domain: "gris_nhem"
         force_bootstrap_first_run: False
 
         kv_pairs:
@@ -75,12 +75,12 @@ pism_nh:
                 bed_deformation.model: "lc"
                 calving.methods: 'eigen_calving,thickness_calving'
                 calving.thickness_calving.threshold: 200
-                geometry.front_retreat.prescribed.file: "/work/ba1066/a270124/pool_pism/masks/nhem/pismr_nhem_10km_no-tibet_mask.nc"
-                #ccr:new:geometry.front_retreat.prescribed.file: "/work/ba1347/PISM/initial/GrIS_nhem/OceanMasks_10km.nc"
+                #:org:nhem:geometry.front_retreat.prescribed.file: "/work/ba1066/a270124/pool_pism/masks/nhem/pismr_nhem_10km_no-tibet_mask.nc"
+                geometry.front_retreat.prescribed.file: "/work/ba1347/PISM/initial/GrIS_nhem/OceanMasks_10km.nc"
                 ocean.pik_melt_factor: "1e-2"
                 atmosphere.elevation_change.precip_lapse_rate: 0.0
                 atmosphere.elevation_change.smb_lapse_rate: 0.0
-                # PICO switches CCR
+                # PICO switches
 
         flags:
                 #- "bootstrap"
