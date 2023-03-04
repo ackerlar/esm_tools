@@ -52,8 +52,9 @@ pism_nh:
         #CCR spinup_file: Start at time0
         #TODO#old#spinup_file: "/work/ba0989/a270124/PalModII/experiments/_old/PI_bootstrap/restart/pism/PI_bootstrap_pismr_restart_10000101-10091231.nc"
         #:org:nhem:spinup_file: "/work/ba1347/PISM/initial/NHEM/PI_bootstrap_pismr_restart_10000101-10091231.nc"
+        #:org:nhem:pool_dir: "/work/ba1066/a270124/pool_pism/"
         spinup_file: "/work/ba1347/PISM/initial/GrIS_nhem/GrIS_bootstrap_pismr_restart_05km.nc"
-        pool_dir: "/work/ba1066/a270124/pool_pism/"
+        pool_dir: "/work/ba1347/PISM/pool_pism_cr/"
         ts_interval: "1"
         ex_interval: "monthly"
         #:org:nhem:domain: "nhem"
