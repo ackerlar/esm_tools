@@ -631,7 +631,11 @@ set_glacial_mask_jsbach_update_restart_jsbach() {
         newest_jsbach_restart_file=$(readlink ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach.nc)
         # Make a backup copy
         #cp $(readlink ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach.nc) ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach_backup_$(date +%Y%m%d%H%M%S).nc
-        cp ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach.nc ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach_backup_$(date +%Y%m%d%H%M%S).nc
+
+        #todo:rm:old:cp ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach.nc ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach_backup_$(date +%Y%m%d%H%M%S).nc
+	BAK_FILENAME=$(basename $(readlink ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach.nc))
+	cp ${RESTART_DIR_jsbach}/restart_${EXP_ID}_jsbach.nc ${RESTART_DIR_jsbach}/${BAK_FILENAME%%.nc}_backup_$(date +%Y%m%d%H%M%S).nc
+
         echo -e "\t\t- Unpacking JSBACH restart file: $newest_jsbach_restart_file"
         # Ensure that the unpack binary is here:
         if [ ! -f unpack ]; then
@@ -878,7 +882,10 @@ set_glacial_mask_jsbach_update_restart_veg() {
 
         newest_jsbach_restart_file=$(readlink ${RESTART_DIR_jsbach}/restart_${EXP_ID}_veg.nc)
         # Make a backup copy
-        cp ${RESTART_DIR_jsbach}/restart_${EXP_ID}_veg.nc ${RESTART_DIR_jsbach}/restart_${EXP_ID}_veg_backup_$(date +%Y%m%d%H%M%S).nc
+        #todo:rm:old:cp ${RESTART_DIR_jsbach}/restart_${EXP_ID}_veg.nc ${RESTART_DIR_jsbach}/restart_${EXP_ID}_veg_backup_$(date +%Y%m%d%H%M%S).nc
+	BAK_FILENAME=$(basename $(readlink ${RESTART_DIR_jsbach}/restart_${EXP_ID}_veg.nc))
+	cp ${RESTART_DIR_jsbach}/restart_${EXP_ID}_veg.nc ${RESTART_DIR_jsbach}/${BAK_FILENAME%%.nc}_backup_$(date +%Y%m%d%H%M%S).nc
+
         echo -e "\t\t- Unpacking JSBACH restart file: $newest_jsbach_restart_file"
         # Ensure that the unpack binary is here:
         if [ ! -f unpack ]; then
