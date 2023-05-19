@@ -55,12 +55,13 @@ pism_sh:
         #TODO#08km#PICO_basins_only_file: "/work/ab0246/a270096/share/pism/ANT.08km/OCEForcing.piControl.08km.nc"
         #TODO#16km#PICO_basins_only_file: "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
         PICO_basins_only_file: "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
-
+        
         kv_pairs:
                 title: AntarcticaPISM
                 max_dt: 0.83333333
                 stress_balance.model: "ssa+sia"
-                stress_balance.sia.max_diffusivity: 800
+                #stress_balance.sia.max_diffusivity: 512000
+                stress_balance.sia.max_diffusivity: 64000
                 sia_e: 2.5
                 ssa_e: 0.512
                 sia_n: 3.0
@@ -74,19 +75,23 @@ pism_sh:
                 #TODO#hydrology.tillwat_max: 1
                 hydrology: "null"
                 bed_deformation.model: "lc"
+                bed_deformation.lc.update_interval: 1
                 calving.methods: "eigen_calving,thickness_calving"
                 #TODO#16km#calving.thickness_calving.threshold: 100
                 #TODO#16km#eigen_calving_K: 1.0e18
                 #TODO#16km#geometry.front_retreat.prescribed.file: "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
+                #TODO#16km#front_retreat_file: "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
                 #TODO#08km#calving.thickness_calving.threshold: 75
                 #TODO#08km#eigen_calving_K: 5.0e17
                 #TODO#08km#geometry.front_retreat.prescribed.file: "/work/ab0246/a270096/share/pism/ANT.08km/OCEForcing.piControl.08km.nc"
+                #TODO#08km#front_retreat_file: "/work/ab0246/a270096/share/pism/ANT.08km/OCEForcing.piControl.08km.nc"
                 calving.thickness_calving.threshold: 100
                 eigen_calving_K: 5.0e17
                 front_retreat_file: "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
                 #TODO#ocean.pik_melt_factor: "1e-2"
-                #TODO#atmosphere.elevation_change.precip_lapse_rate: 0.0
-                #TODO#atmosphere.elevation_change.smb_lapse_rate: 0.0
+                atmosphere.elevation_change.temperature_lapse_rate: 0.0
+                atmosphere.elevation_change.precip_lapse_rate: 0.0
+                atmosphere.elevation_change.smb_lapse_rate: 0.0
                 # PICO switches CCR ## Note: File name below in couplers-ocean-pico
                 number_of_boxes: 5
                 continental_shelf_depth: -800
@@ -134,7 +139,6 @@ pism_sh:
                                 env_preparation: env_pism.py
                                 run_only: first_run_in_chunk
                                 #skip_chunk_number: 1
-
                         couple_out:
                                 nproc: 1
                                 run_after: tidy
