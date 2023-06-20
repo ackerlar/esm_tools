@@ -15,7 +15,7 @@
 # TYPE        : NetCDF file file type, as reported by `ncdump -k`
 #               (default=classic;
 #                valid=classic/nc3/3, "64-bit offset"/nc6/6,
-#                      "64-bit data"/nc5/5, netCDF-4/nc4/4, 
+#                      "64-bit data"/nc5/5, netCDF-4/nc4/4,
 #                      "netCDF-4 classic model"/nc7/7)
 # CALENDAR    : Calendar type 360, 365, ... (default=360)
 # NUM_TYPE    : Number type of time axis (default=double;
@@ -24,13 +24,12 @@
 # Examples:
 #          ./CreateTimeAxisNC.bash 100 TimeAxis.nc
 #          ./CreateTimeAxisNC.bash 100 TimeAxis.360.nc 0 classic 360_day double
-# 
+#
 # (c) Christian Rodehacke, AWI, 2017-09-27 (first version)
 #     Christian Rodehacke, AWI, 2017-09-28 (NetCDF type:  optional 4th parameter)
 #     Christian Rodehacke, AWI, 2018-09-12 (Calendar:     optional 5th parameter)
 #     Christian Rodehacke, AWI, 2018-09-19 (Numeric tyupe:optional 6th parameter)
 #
-module load nco
 
 NO_LINES=25 ; NO_NEED_INPUTS=1
 set -e
@@ -144,7 +143,7 @@ function CreateTimeAxisNC() {
 	    exit 4
 	    ;;
     esac
-	
+
 
     #
     # *** If you change something here, also change the 'awk' computation below!!
@@ -205,7 +204,7 @@ data:
         //For :calendar = "360_day" ;
         time = $time_ ;
 	time_bnds = $time_bnds_ ;
-	
+
 }
 EOF
 
@@ -268,8 +267,26 @@ fi
 #
 ELEMENTS_NO=$(( ELEMENTS_NO - 1 ))
 
+#
+# Since conflicting module create a challenge, we save the current set
+# of loaded modules, purge the module list, load necessary working
+# modules, do the job by calling CreateTimeAxisNC, and restore the
+# former purged module list.
+#
+# MODULE-FIX: 1/2
+module_save_file=/tmp/module2restore_4CreateTimeAxisNC.bash
+module save -f $module_save_file
+module purge
+module load netcdf-c nco
+
 CreateTimeAxisNC ${ELEMENTS_NO} ${OUTPUT_NC} ${OFFSET} ${CALENDAR} ${NUM_TYPE}
 
+#
+# Recover purged modules
+#
+# MODULE_FIX: 2/2
+module restore -f $module_save_file && rm $module_save_file
+module load nco
 
 exit 0
 # -- last line
