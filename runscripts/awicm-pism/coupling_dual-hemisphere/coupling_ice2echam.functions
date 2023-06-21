@@ -272,10 +272,26 @@ set_glacial_mask_select_field() {
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.nc \
             ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_mask_current.nc 2>> cdo_stderr_ice2echam
 	mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_mask_current.nc tmp
+	# Since conflicting module create a challenge, we save
+	# the current set of loaded modules, purge the module
+	# list, load necessary working modules, do the job by
+	# calling ncdump and ncgen, and restore the former
+	# purged module list.
+	#
+	# MODULE-FIX: 1/2
+	 module_save_file=/tmp/module2restore_4ncdump_ncgen.$$
+	 module save -f $module_save_file
+	 module purge
+	 module load netcdf-c
         ncdump tmp | sed 's/byte/float/g' | ncgen -o tmp.nc; mv tmp.nc tmp
+	#
+	# Recover purged modules
+	#
+	# MODULE_FIX: 2/2
+	 module restore -f $module_save_file && rm $module_save_file
+
         mv tmp ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_mask_current.nc
         rmlist="$rmlist ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_mask_current.nc"
-
 }
 
 ## @fn set_glacial_mask_echam_restart_file_1st()
@@ -325,7 +341,24 @@ set_glacial_mask_echam_restart_file_2nd() {
         cdo -s -selvar,glac ${ECHAM_RESTART_FILE} just_glac.nc 2>> cdo_stderr_ice2echam
         cdo -s -ifthenelse -setmisstoc,0 $dfile -chname,ice_mask,glac $ifile just_glac.nc just_glac_new.nc 2>> cdo_stderr_ice2echam
 
+	# Since conflicting module create a challenge, we save
+	# the current set of loaded modules, purge the module
+	# list, load necessary working modules, do the job by
+	# calling ncdump and ncgen, and restore the former
+	# purged module list.
+	#
+	# MODULE-FIX: 1/2
+	 module_save_file=/tmp/module2restore_4ncdump_ncgen.$$
+	 module save -f $module_save_file
+	 module purge
+	 module load netcdf-c
         ncdump just_glac_new.nc | sed s/int/double/g | ncgen -o tmp; mv tmp just_glac_new.nc
+	#
+	# Recover purged modules
+	#
+	# MODULE_FIX: 2/2
+	 module restore -f $module_save_file && rm $module_save_file
+
         # This multipliation transforms "float" into "double"
         ncap=${ncap:-ncap2}
         $ncap -s "glac=glac*1.0000000000000;" \
@@ -667,8 +700,24 @@ set_glacial_mask_jsbach_update_restart_jsbach() {
         ls -ratl
         restartfile=2d_$(basename ${newest_jsbach_restart_file})
         # 'cdo showvar' does not work for variables with more than three dimensiones
+	# Since conflicting module create a challenge, we save
+	# the current set of loaded modules, purge the module
+	# list, load necessary working modules, do the job by
+	# calling ncdump, and restore the former
+	# purged module list.
+	#
+	# MODULE-FIX: 1/2
+	 module_save_file=/tmp/module2restore_4ncdump.$$
+	 module save -f $module_save_file
+	 module purge
+	 module load netcdf-c
         echo "ncdump -h ${restartfile} | grep 'double ' | cut -f 2 -d ' ' | cut -f1 -d '('"
         variables=$(ncdump -h ${restartfile} | grep 'double ' | cut -f 2 -d ' ' | cut -f1 -d '(')
+	#
+	# Recover purged modules
+	#
+	# MODULE_FIX: 2/2
+	 module restore -f $module_save_file && rm $module_save_file
         echo $variables
 
         # Rename the "tiles" dimension to "time", since cdo can only handle 4D
@@ -914,8 +963,24 @@ set_glacial_mask_jsbach_update_restart_veg() {
         ls -ratl
         restartfile=2d_$(basename ${newest_jsbach_restart_file})
         # 'cdo showvar' does not work for variables with more than three dimensiones
+	# Since conflicting module create a challenge, we save
+	# the current set of loaded modules, purge the module
+	# list, load necessary working modules, do the job by
+	# calling ncdump, and restore the former
+	# purged module list.
+	#
+	# MODULE-FIX: 1/2
+	 module_save_file=/tmp/module2restore_4ncdump.$$
+	 module save -f $module_save_file
+	 module purge
+	 module load netcdf-c
         echo "ncdump -h ${restartfile} | grep 'double ' | cut -f 2 -d ' ' | cut -f1 -d '('"
         variables=$(ncdump -h ${restartfile} | grep 'double ' | cut -f 2 -d ' ' | cut -f1 -d '(')
+	#
+	# Recover purged modules
+	#
+	# MODULE_FIX: 2/2
+	 module restore -f $module_save_file && rm $module_save_file
         echo $variables
 
         for var in ${variables}; do
@@ -1229,8 +1294,25 @@ set_in_jsbach_restart_file() {
 change_lonlat() {
         file=$1
         varname=$2
+	# Since conflicting module create a challenge, we save
+	# the current set of loaded modules, purge the module
+	# list, load necessary working modules, do the job by
+	# calling ncdump, and restore the former
+	# purged module list.
+	#
+	# MODULE-FIX: 1/2
+	 module_save_file=/tmp/module2restore_4ncdump.$$
+	 module save -f $module_save_file
+	 module purge
+	 module load netcdf-c nco
         if ncdump -h $file | grep "${varname}" | grep -q "lon, lat"; then
                 echo "                -   changing lat/lon dimension order for $varname in $file"
                 ncpdq -a lat,lon $file tmp; mv tmp $file 2>> nco_stderr_ice2echam
         fi
+	#
+	# Recover purged modules
+	#
+	# MODULE_FIX: 2/2
+	 module restore -f $module_save_file && rm $module_save_file
+
 }

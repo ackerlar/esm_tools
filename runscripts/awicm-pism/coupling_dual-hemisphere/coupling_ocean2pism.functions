@@ -862,7 +862,9 @@ function iterative_coupling_ocean_pism_regrid_set_time_axis {
                 echo "     - Use $_script2build_time_axis to determine continious time axis"
                 #${_script2build_time_axis} ${_nt} ${__file_taxis}
                 #${_script2build_time_axis} ${_nt} ${__file_taxis} 0 classic 360 double
+		#${_script2build_time_axis} ${_nt} ${__file_taxis} 0 classic 365 double
                 ${_script2build_time_axis} ${_nt} ${__file_taxis} 0 classic 365 float
+
             fi
         else
 	    # Should not be here if we delete $__file_taxis before.
