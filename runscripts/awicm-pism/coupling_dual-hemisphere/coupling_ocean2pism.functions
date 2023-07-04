@@ -165,6 +165,7 @@ function ocean2pism {
         "PICO_OCEAN")
             iterative_coupling_ocean_pism_compute_ocean_tempsalt_forcing ${PISM_OCEAN_FORCING_FILE}
             PISM_OCEAN_PICO_BASINS_FILE=${PISM_OCEAN_PICO_BASINS_FILE:-${PISM_OCEAN_FORCING_FILE}}
+
             echo " * Doing iterative_coupling_ocean_pism_prepare_pico_ocean_forcing ..."
             iterative_coupling_ocean_pism_prepare_pico_ocean_forcing ${PISM_OCEAN_PICO_BASINS_FILE} ${PISM_OCEAN_FORCING_FILE}
             echo "      ...done."
@@ -222,7 +223,7 @@ function ocean2pism {
             break # call results.sh outside loop
         else
             (( retry = retry + 1 ))
-            sleep 1
+            sleep 10
         fi
     done
     if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/latest_ocean_forcing_file.nc ]; then
@@ -526,10 +527,10 @@ function iterative_coupling_ocean_pism_prepare_pico_ocean_forcing {
         fi
     done
 
-    echo "Wrting basins from $_bfile to $_ofile"
+    echo "Writing basins from $_bfile to $_ofile"
     ncks -Av basins $_bfile $_ofile
-    ncpdq -a time,x,y $_ofile tmp.pico.nc
-    mv tmp.pico.nc $_ofile
+    #for_special_cases_only:ncpdq -a time,x,y $_ofile tmp.pico.nc
+    #for_special_cases_only:mv tmp.pico.nc $_ofile
     echo "      ...done."
 }
 
