@@ -92,8 +92,10 @@ choose_computer.partitions.compute.cores_per_node:
     "128":
         #todo:org#nnodes: 1
         #todo:org#nproca: 128
-        nnodes: 4
-        nproca: 512
+        #nnodes: 4
+        #nproca: 512
+        nnodes: 3
+        nproca: 384
         nprocb: 1
 
 time_step: 100
