@@ -17,6 +17,12 @@ choose_domain:
                             nz: 166
                             bz: 21
                             grid_edge: 8
+                        08km:
+                            nx: 761
+                            ny: 761
+                            nz: 166
+                            bz: 21
+                            grid_edge: 8
         "antarctica":
                 choose_resolution:
                         32km:
