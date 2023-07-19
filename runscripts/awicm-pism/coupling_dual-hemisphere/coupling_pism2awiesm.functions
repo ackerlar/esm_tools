@@ -34,7 +34,9 @@ pism2awiesm() {
     . ${FUNCTION_PATH}/coupling_pism2atmosphere.functions
     . ${FUNCTION_PATH}/coupling_pism2ocean.functions
 
-    echo "*** Starting pis2atmosphere ***"
-    pism2atmosphere 2>> ${COUPLE_DIR}/cdo_stderr_pism2awiesm 
-    #pism2ocean
+    echo "*** Starting pism2atmosphere ***"
+    pism2atmosphere 2>> ${COUPLE_DIR}/cdo_stderr_pism2awiesm
+
+    echo "*** Starting pism2ocean ***"
+    pism2ocean 2>> ${COUPLE_DIR}/cdo_stderr_pism2awiesm
 }
