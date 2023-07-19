@@ -970,7 +970,7 @@ ic_oce2pism_anoforce_initialize(){
     # Hydrographic/Ocean REFERENCE data and its variables. These could
     # be the "truth".
     #
-    REFERENCE_OCEAN_FNAME="/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"
+    REFERENCE_OCEAN_FNAME=${REFERENCE_OCEAN_FNAME:-"/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"}
     REFERENCE_OCEAN_VNAME_TEMP_OCEAN="theta_ocean"
     REFERENCE_OCEAN_VNAME_SALT_OCEAN="salinity_ocean"
     REFERENCE_OCEAN_VNAME_BASIN="basins"
@@ -989,7 +989,7 @@ ic_oce2pism_anoforce_initialize(){
     # warming simulations, this BASE STATE could prepresent the
     # control climate piControl, for instance.
     #
-    BASE_STATE_OCEAN_FNAME="/work/ab0246/a270096/share/pism/ANT.16km/ocean_forcing4pism_base_state.pism_sh.nc"
+    BASE_STATE_OCEAN_FNAME=${BASE_STATE_OCEAN_FNAME:-"/work/ab0246/a270096/share/pism/ANT.16km/ocean_forcing4pism_base_state.pism_sh.nc"}
     BASE_STATE_OCEAN_VNAME_TEMP_OCEAN="theta_ocean"
     BASE_STATE_OCEAN_VNAME_SALT_OCEAN="salinity_ocean"
 

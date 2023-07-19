@@ -2054,7 +2054,7 @@ ic_atm2pism_anoforce_initialize(){
     # Atmospheric REFERENCE data and its variables. These could be the
     # "truth".
     #
-    REFERENCE_ATMOS_FNAME="/work/ab0246/a270096/share/pism/ANT.16km/ATMForcing.piControl.16km.nc"
+    REFERENCE_ATMOS_FNAME=${REFERENCE_ATMOS_FNAME:-"/work/ab0246/a270096/share/pism/ANT.16km/ATMForcing.piControl.16km.nc"}
     REFERENCE_ATMOS_VNAME_ELEVATION="surface_altitude"
     REFERENCE_ATMOS_VNAME_TEMP_AIR="air_temp"
     REFERENCE_ATMOS_VNAME_TEMP_FIRN="ice_surface_temp"
@@ -2073,7 +2073,7 @@ ic_atm2pism_anoforce_initialize(){
     # simulations, this BASE STATE could prepresent the control
     # climate piControl, for instance.
     #
-    BASE_STATE_ATMOS_FNAME="/work/ab0246/a270096/share/pism/ANT.16km/atmo_given_file_base_state.pism_sh.nc"
+    BASE_STATE_ATMOS_FNAME=${BASE_STATE_ATMOS_FNAME:-"/work/ab0246/a270096/share/pism/ANT.16km/atmo_given_file_base_state.pism_sh.nc"}
     BASE_STATE_ATMOS_VNAME_TEMP_AIR="air_temp"
     BASE_STATE_ATMOS_VNAME_TEMP_FIRN="ice_surface_temp"
     BASE_STATE_ATMOS_VNAME_PRECIP="precipitation"
