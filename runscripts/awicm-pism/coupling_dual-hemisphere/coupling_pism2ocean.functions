@@ -33,12 +33,15 @@ function pism2ocean {
     #CHUNK_DATE_TAG_awicm="${CHUNK_START_DATE_awicm}-${CHUNK_END_DATE_awicm}"
 
 #TODO Get the right file names for the forcing/extra and restart/output file names
-    PISM_FORCING_EXTRA_FILE=../outdata/pism/${EXP_ID}_pismr_extra_${CHUNK_DATE_TAG_pism}.nc
-    #PISM_RESTART_OUTPUT_FILE=../restart/pism/${EXP_ID}_pismr_out_${CHUNK_DATE_TAG_pism}.nc
-    PISM_RESTART_OUTPUT_FILE=../restart/pism/${EXP_ID}_pismr_restart_${CHUNK_DATE_TAG_pism}.nc
-    COMBINED_OUTPUT=ice_file_at_ocean.combined.nc
+    #TODO:alt:version:rm#PISM_FORCING_EXTRA_FILE=../outdata/pism/${DOMAIN_pism}/${EXP_ID}_pismr_extra_${CHUNK_DATE_TAG_pism}.nc
+    #TODO:alt_old:version:rm##PISM_RESTART_OUTPUT_FILE=../restart/pism/${EXP_ID}_pismr_out_${CHUNK_DATE_TAG_pism}.nc
+    #TODO:alt:version:rm#PISM_RESTART_OUTPUT_FILE=../restart/pism/${DOMAIN_pism}/${EXP_ID}_pismr_restart_${CHUNK_DATE_TAG_pism}.nc
+    PISM_FORCING_EXTRA_FILE=${OUTPUT_DIR_pism}/${EXP_ID}_pismr_extra_${CHUNK_DATE_TAG_pism}.nc
+    PISM_RESTART_OUTPUT_FILE=${OUTPUT_DIR_pism}/${EXP_ID}_pismr_restart_${CHUNK_DATE_TAG_pism}.nc
+    COMBINED_OUTPUT=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.combined.nc
 
     # TODO Are these sensible choices?
+    #TODO:future?#iter_coup_interact_method_ice2oce=${iter_coup_interact_method_ice2oce:-BASALSHELF_WATER_ICEBERG_WATERHEAT}
     iter_coup_interact_method_ice2oce=${iter_coup_interact_method_ice2oce:-BASALSHELF_WATER}
 
     iterative_coupling_pism_ocean_write_names
@@ -283,7 +286,7 @@ function iterative_coupling_pism_ocean_prepare_ocean_basalshelf_water_forcing {
     test_file_or_exit $PISM_FORCING_EXTRA_FILE 5
     test_file_or_exit $cdo_table_file 6
 
-    _out_file=ice_file_at_ocean.basalwater.nc
+    _out_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.basalwater.nc
 #TODO :
 #Warning: Number of OMP threads is greater than number of Cores=1!
 #srun: error: prod-0177: task 0: Exited with exit code 1
@@ -294,7 +297,7 @@ function iterative_coupling_pism_ocean_prepare_ocean_basalshelf_water_forcing {
 
     iterative_coupling_pism_ocean_convert_mass_loss_to_mass_flux ${_out_file} water_loss
 
-    cleanup_list="${cleanup_list} $(pwd)/${_out_file}"
+    cleanup_list="${cleanup_list} ${_out_file}"
     unset _out_file
     echo "     ...done."
 }
@@ -307,7 +310,7 @@ function iterative_coupling_pism_ocean_prepare_ocean_iceberg_water_forcing {
     test_file_or_exit $PISM_FORCING_EXTRA_FILE 7
     test_file_or_exit $cdo_table_file 8
 
-    _out_file=ice_file_at_ocean.icebergwater.nc
+    _out_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.icebergwater.nc
     $cdo ymonmean \
 	-selvar,lon,lat,wnet_iceberg -setpartabn,${cdo_table_file},convert \
 	$PISM_FORCING_EXTRA_FILE ${_out_file}
@@ -324,7 +327,7 @@ function iterative_coupling_pism_ocean_prepare_ocean_iceberg_water_forcing {
 	    ;;
     esac
 
-    cleanup_list="${cleanup_list} $(pwd)/${_out_file}"
+    cleanup_list="${cleanup_list} ${_out_file}"
     unset _out_file
     echo "     ...done."
 }
@@ -344,7 +347,7 @@ function iterative_coupling_pism_ocean_prepare_ocean_iceberg_heat_forcing {
     # TODO : Check if we use a consident set for "heat of fusion of water into ice"
     heat_of_fusion_of_water=333550 #Joule kg-1
 
-    _out_file=ice_file_at_ocean.icebergheat.nc
+    _out_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.icebergheat.nc
     $cdo ymonmean \
 	-setvar,qnet_iceberg \
 	-setunit,"Joule" \
@@ -363,7 +366,7 @@ function iterative_coupling_pism_ocean_prepare_ocean_iceberg_heat_forcing {
 	    ;;
     esac
 
-    cleanup_list="${cleanup_list} $(pwd)/${_out_file}"
+    cleanup_list="${cleanup_list} ${_out_file}"
     unset _out_file
     echo "     ...done."
 }
@@ -387,9 +390,9 @@ function iterative_coupling_pism_ocean_prepare_iceshelf_temperature_gradient_for
 
     #ncks -d time,-1,-1 -d z,0,1 -v ${__varname} \
     ncks -d time,-1,-1 -v ${__varname} \
-	${PISM_RESTART_OUTPUT_FILE} ice_file_at_ocean.laststep.bottom_iceshelf_temp.nc
+	${PISM_RESTART_OUTPUT_FILE} ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.bottom_iceshelf_temp.nc
 
-    cleanup_list="${cleanup_list} $(pwd)/ice_file_at_ocean.laststep.bottom_iceshelf_temp.nc"
+    cleanup_list="${cleanup_list} ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.bottom_iceshelf_temp.nc"
     unset __varname
     echo "     ...done."
 }
@@ -412,37 +415,38 @@ function iterative_coupling_pism_ocean_prepare_ocean_update_mask_forcing {
     test_file_or_exit $PISM_RESTART_OUTPUT_FILE 12
 
     ncks -d time,-1,-1 -v ${__varname} \
-	${PISM_RESTART_OUTPUT_FILE} ice_file_at_ocean.laststep.pismmask.nc
+	 ${PISM_RESTART_OUTPUT_FILE} \
+	 ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.pismmask.nc
 
     $cdo -setvar,${ocean_name_oceanmask} \
-	eqc,4 ice_file_at_ocean.laststep.pismmask.nc \
-	ice_file_at_ocean.laststep.mask_ocean.nc
+	eqc,4 ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.pismmask.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_ocean.nc
     $cdo -setvar,${ocean_name_iceshelfmask} \
-	-eqc,3 ice_file_at_ocean.laststep.pismmask.nc \
-	ice_file_at_ocean.laststep.mask_iceshelf.nc
+	-eqc,3 ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.pismmask.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_iceshelf.nc
     $cdo -setvar,${ocean_name_landmask} \
-	-lec,2 ice_file_at_ocean.laststep.pismmask.nc \
-	ice_file_at_ocean.laststep.mask_land.nc
+	-lec,2 ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.pismmask.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_land.nc
 
     if [ 1 -eq 0 ] ; then
 	#
 	# Drop time axis
 	#
 	for _file in \
-	    ice_file_at_ocean.laststep.mask_land.nc \
-	    ice_file_at_ocean.laststep.mask_ocean.nc \
-	    ice_file_at_ocean.laststep.mask_iceshelf.nc
+	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_land.nc \
+	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_ocean.nc \
+	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_iceshelf.nc
 	do
 	    if [ -f ${_file} ] ; then
 		_file_tmp=${_file%.*}_before_collapse_time.nc
 		mv -f $_file $_file_tmp
 		ncwa -a time $_file_tmp ${_file}
-		cleanup_list="${cleanup_list} $(pwd)/${_file} $(pwd)/${_file_tmp}"
+		cleanup_list="${cleanup_list} ${_file} ${_file_tmp}"
 	    fi
 	done
     fi
 
-    cleanup_list="${cleanup_list} $(pwd)/ice_file_at_ocean.laststep.pismmask.nc"
+    cleanup_list="${cleanup_list} ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.pismmask.nc"
     unset _file _file_tmp __varname
 }
 
@@ -542,7 +546,7 @@ function iterative_coupling_pism_ocean_convert_mass_loss_to_mass_flux {
     $cdo -setunit,"${_unit}" ${_CDO_Factor_flags} \
 	${_bak} ${_infile}
 
-    cleanup_list="${cleanup_list} $(pwd)/${_bak}"
+    cleanup_list="${cleanup_list} ${_bak}"
 
     unset _bak _infile _type _unit _CDO_Factor_flags
     unset MUL_recipro_delta_time MUL_recipro_grid_area
@@ -557,56 +561,56 @@ function iterative_coupling_pism_ocean_prepare_combine_forcings {
     #
     # Fresh water
     #
-    _file1=ice_file_at_ocean.basalwater.nc
-    _file2=ice_file_at_ocean.icebergwater.nc
+    _file1=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.basalwater.nc
+    _file2=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.icebergwater.nc
     if [ -f $_file1 -a -f $_file2  ] ; then
 	cdo_task_list="${cdo_task_list} -setvar,${ocean_name_freshwater_flux}"
 	cdo_task_list="${cdo_task_list} -add -selvar,wnet_basal $_file1 -selvar,wnet_iceberg $_file2"
-	cleanup_list="${cleanup_list} $(pwd)/${_file1}"
-	cleanup_list="${cleanup_list} $(pwd)/${_file2}"
+	cleanup_list="${cleanup_list} ${_file1}"
+	cleanup_list="${cleanup_list} ${_file2}"
     else
 	if [ -f $_file1  ] ; then
 	    cdo_task_list="${cdo_task_list} -setvar,${ocean_name_freshwater_flux} -selvar,wnet_basal $_file1"
-	    cleanup_list="${cleanup_list} $(pwd)/${_file1}"
+	    cleanup_list="${cleanup_list} ${_file1}"
 	elif [ -f $_file2  ] ; then
 	    cdo_task_list="${cdo_task_list} -setvar,${ocean_name_freshwater_flux} -selvar,wnet_iceberg $_file2"
-	    cleanup_list="${cleanup_list} $(pwd)/${_file2}"
+	    cleanup_list="${cleanup_list} ${_file2}"
 	fi
     fi
 
     #
     # Heat flux
     #
-    _file1=ice_file_at_ocean.icebergheat.nc
+    _file1=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.icebergheat.nc
     if [ -f ${_file1} ] ; then
 	cdo_task_list="${cdo_task_list} -setvar,${ocean_name_heat_flux} -selvar,qnet_iceberg ${_file1}"
-	cleanup_list="${cleanup_list} $(pwd)/${_file1}"
+	cleanup_list="${cleanup_list} ${_file1}"
     fi
 
     #
     # Temperature gradient, Masks
     #
-    for _file1 in ice_file_at_ocean.laststep.bottom_iceshelf_temp.nc \
-	ice_file_at_ocean.laststep.mask_ocean.nc \
-	ice_file_at_ocean.laststep.mask_iceshelf.nc \
-	ice_file_at_ocean.laststep.mask_land.nc
+    for _file1 in ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.bottom_iceshelf_temp.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_ocean.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_iceshelf.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.laststep.mask_land.nc
     do
 	if [ -f $_file1 ] ; then
 	    # Drop time axis is done above (search for ncwa)
 	    _file2=${_file1%.*}_before_combine.nc
 	    mv -f $_file1 $_file2
 	    ncwa -a time $_file2 $_file1
-	    cleanup_list="${cleanup_list} $(pwd)/${_file2}"
+	    cleanup_list="${cleanup_list} ${_file2}"
 
 	    cdo_task_list="${cdo_task_list} ${_file1}"
-	    cleanup_list="${cleanup_list} $(pwd)/${_file1}"
+	    cleanup_list="${cleanup_list} ${_file1}"
 	fi
     done
 
     #
     # Auxillary fields
     #
-    _file1=aux_field_pism4ocean.nc
+    _file1=${COUPLE_DIR}/${PISM_HEMISPHERE}/aux_field_pism4ocean.nc
     if [ -f ${PISM_RESTART_OUTPUT_FILE} ] ; then
 	ncks -OQv lon,lat ${PISM_RESTART_OUTPUT_FILE} ${_file1}
     elif [ -f ${PISM_FORCING_EXTRA_FILE} ] ; then
@@ -615,14 +619,14 @@ function iterative_coupling_pism_ocean_prepare_combine_forcings {
     if [ -f $_file1 ] ; then
 	cdo_task_list="${cdo_task_list} ${_file1}"
     fi
-    cleanup_list="${cleanup_list} $(pwd)/${_file1}"
+    cleanup_list="${cleanup_list} ${_file1}"
 
     #
     # Merge
     #
     if [ -f ${COMBINED_OUTPUT} ] ; then
 	mv -f ${COMBINED_OUTPUT} ${COMBINED_OUTPUT}~
-	cleanup_list="${cleanup_list} $(pwd)/${COMBINED_OUTPUT}~"
+	cleanup_list="${cleanup_list} ${COMBINED_OUTPUT}~"
     fi
     $cdo -O merge ${cdo_task_list} ${COMBINED_OUTPUT}
 
@@ -657,7 +661,7 @@ function iterative_coupling_get_pism_area_size {
 	exit 38
     fi
 
-    __area_file=tmp_pism_area.nc
+    __area_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/tmp_pism_area.nc
     # Compute the area
     if [ 0 -eq 1 ] ; then
 	# NCAP2 version (NCAP does not work)
@@ -678,7 +682,7 @@ function iterative_coupling_get_pism_area_size {
     fi
 
     echo ${__area_size}
-    cleanup_list="${cleanup_list} $(pwd)/${__area_file}"
+    cleanup_list="${cleanup_list} ${__area_file}"
     unset __area_file __area_size __file
 }
 
@@ -700,7 +704,7 @@ function iterative_coupling_get_pism_time_size {
 	exit 39
     fi
 
-    __time_file=tmp_pism_time.nc
+    __time_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/tmp_pism_time.nc
 
     # Compute the time
     if [ 0 -eq 1 ] ; then
@@ -720,7 +724,7 @@ function iterative_coupling_get_pism_time_size {
     fi
 
     echo ${__time_size}
-    cleanup_list="${cleanup_list} $(pwd)/${__time_file}"
+    cleanup_list="${cleanup_list} ${__time_file}"
     unset __time_file __time_size __file
 }
 

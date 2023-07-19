@@ -32,7 +32,7 @@ function ice2fesom {
     WEIGHTS_ICE2OCE=${WEIGHTS_ICE2OCE:-weights_ice2oce.${INTERPOL_TYPE_OCE}.nc}
     GRIDDES_OCE=${GRIDDES_OCE:-ocean.griddes}
     OCEAN_PISM_FORCING_FILE="pism_forcing4ocean_verXXXX.${INTERPOL_TYPE_OCE}.${CHUNK_DATE_TAG_awicm}.nc"
-    COMBINED_OUTPUT=ice_file_at_ocean.combined.nc
+    COMBINED_OUTPUT=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.combined.nc
 
 
     iterative_coupling_ice_fesom1x_write_names
@@ -134,7 +134,7 @@ function iterative_coupling_ice_ocean_regrid_interpolate {
     echo "     => remap,$GRIDDES_OCE,$WEIGHTS_ICE2OCE"
     $cdo remap,$GRIDDES_OCE,$WEIGHTS_ICE2OCE \
 	${COMBINED_OUTPUT} \
-	ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc
 
     cleanup_list="${cleanup_list} $(pwd)/${COMBINED_OUTPUT}"
 }
@@ -151,11 +151,11 @@ function iterative_coupling_ice_ocean_regrid_extrapolate {
 
     _cdo_flag=$( return_allowed_cdo_miss_replace_flags ${iterative_coupling_pism_ocean_regrid_extra_type} ${regrid_pism_ocean_extrapolate_misstoc} )
 
-    _tmp_file=ice_file_at_ocean.${INTERPOL_TYPE_OCE}_before_extrapolation.nc
-    mv ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc ${_tmp_file}
+    _tmp_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.${INTERPOL_TYPE_OCE}_before_extrapolation.nc
+    mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc ${_tmp_file}
 
     $cdo $_cdo_flag ${_tmp_file} \
-	ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc
 
     echo " ... done"
     cleanup_list="${cleanup_list} $(pwd)/${_tmp_file}"
@@ -169,7 +169,7 @@ function iterative_coupling_ice_ocean_regrid_none {
     test_file_or_exit ${COMBINED_OUTPUT} 10
 
     mv ${COMBINED_OUTPUT} \
-	ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc
 
     cleanup_list="${cleanup_list} $(pwd)/${COMBINED_OUTPUT}"
 }
@@ -178,7 +178,7 @@ function iterative_coupling_ice_ocean_regrid_none {
 function iterative_coupling_ice_fesom_rename_vars {
     echo " *   Set final FESOM variable names..."
 
-    test_file_or_exit ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc 11
+    test_file_or_exit ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc 11
 
     ncrename \
 	-v .wnet,${fesom_name_freshwater_flux} \
@@ -187,7 +187,7 @@ function iterative_coupling_ice_fesom_rename_vars {
 	-v .landmask,${fesom_name_landmask} \
 	-v .oceanmask,${fesom_name_oceanmask} \
 	-v .iceshelfmask,${fesom_name_iceshelfmask} \
-	ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc \
+	${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_at_ocean.${INTERPOL_TYPE_OCE}.nc \
 	${OCEAN_PISM_FORCING_FILE}
 
     cleanup_list="${cleanup_list} $(pwd)/ice_file_for_ocean.${INTERPOL_TYPE_OCE}.nc"
