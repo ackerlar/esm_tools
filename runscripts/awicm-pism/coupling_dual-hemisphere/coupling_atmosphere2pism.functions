@@ -1170,6 +1170,7 @@ ic_atm2pism_regrid_remap_cloud_cover() {
 ic_atm2pism_ablation_pdd_make_atmosphere_forcing() {
         echo; echo -e "\t\t* Generating atmo_given file with sensible metadata"
         ic_atm2pism_ablation_pdd_set_temperature_units
+	ic_atm2pism_ablation_pdd_set_ice_surface_temperature_from_temperature
         ic_atm2pism_ablation_pdd_set_precipitation_units
         ic_atm2pism_ablation_pdd_merge_preliminary_files
         ic_atm2pism_ablation_pdd_set_time_axis
@@ -1188,6 +1189,40 @@ ic_atm2pism_ablation_pdd_set_temperature_units() {
         ncrename \
                 -v ${atmosphere_name_temperature},air_temp \
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc
+}
+
+
+## @fn ic_atm2pism_ablation_pdd_set_ice_surface_temperature_from_temperature()
+## @brief
+## Compute the surface ice temperature from air temperature used by `PISM`
+##
+## Compute the time-mean ice surface temperature below the seasonal
+## influence skip/surface.
+##
+## @fixme It should be renamed and improved because it is a hot-fix.
+ic_atm2pism_ablation_pdd_set_ice_surface_temperature_from_temperature() {
+    VAR_NAME_IN="air_temp"
+    VAR_NAME="ice_surface_temp"
+        echo -e "\t\t- compute ${VAR_NAME} from ${VAR_NAME_IN}"
+
+	#
+	# To compute the time series of the time-mean, we use
+	#  -add -mulc,0 -selvar,${VAR_NAME_IN} FILE
+	#       -minc,273.15 -timmean -selvar,${VAR_NAME_IN} FILE
+	#
+	cdo -s \
+	    -setattribute,${VAR_NAME}@long_name="ice_surface_temp" \
+	    -setvar,${VAR_NAME} \
+	    -add \
+       	         -mulc,0.0 -selvar,${VAR_NAME_IN} \
+	    	 ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+	         -minc,273.15 -timmean -selvar,${VAR_NAME_IN} \
+		 ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
+	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/${VAR_NAME}.pism.nc
+
+	ncatted -a standard_name,${VAR_NAME},d,, \
+		-a pism_intent,${VAR_NAME},d,, \
+		${COUPLE_DIR}/${PISM_HEMISPHERE}/${VAR_NAME}.pism.nc
 }
 
 
@@ -1246,6 +1281,13 @@ ic_atm2pism_ablation_pdd_merge_preliminary_files() {
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/precipitation.nc \
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature.nc \
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmo_given_file.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+
+	file2add=${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_surface_temp.pism.nc
+	if [ -f $file2add ] ; then
+	    echo -e "\t\t\t+ add $(basename $file2add)"
+	    ncks -A $file2add \
+		 ${COUPLE_DIR}/${PISM_HEMISPHERE}/atmo_given_file.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+	fi
 }
 
 
