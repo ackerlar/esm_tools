@@ -1,7 +1,7 @@
 def prepare_environment(config):
     default_input_grid = config["general"]["experiment_couple_dir"] +"/ice.griddes"
     environment_dict = {
-            "PISM_TO_OCEAN": 0,
+            "PISM_TO_OCEAN": 1,
             "OCEAN_TO_PISM": int(config["general"]["first_run_in_chunk"]),
             "COUPLE_DIR": config["general"]["experiment_couple_dir"],
             "VERSION_pism": config[config["general"]["setup_name"]]["version"].replace("github", "").replace("index", "").replace("snowflake", "")[:3],
@@ -61,10 +61,6 @@ def prepare_environment(config):
             #    config["general"]["experiment_couple_dir"] +
             #    "/bedrock_change.nc"
             #    ),
-            #"DOMAIN_pism": config[config["general"]["setup_name"]]["domain"],
-            #"EXE_pism": config[config["general"]["setup_name"]]["executable"],
-            #"RES_pism": config[config["general"]["setup_name"]]["resolution"],
-            #"RUN_NUMBER_pism" : config["general"]["run_number"],
             #"pism_solidearth_initialize_method": config[config["general"]["setup_name"]]["solidearth_initialize_method"],
             #"pism_solidearth_initialize_dummyrun_file": config[config["general"]["setup_name"]].get("solidearth_initialize_dummyrun_file", ""),
             #"INPUT_GRID_pism": config[config["general"]["setup_name"]].get("input_grid", default_input_grid),
