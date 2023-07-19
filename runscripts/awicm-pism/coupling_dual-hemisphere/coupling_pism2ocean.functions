@@ -28,12 +28,14 @@ function pism2ocean {
     #             4) Remap/Regrid to FESOM grid
     #             5) FESOM Names
     #
-    CHUNK_DATE_TAG_pism="${CURRENT_YEAR_pism}-${END_YEAR_pism}"
+    #CHUNK_DATE_TAG_pism="${CURRENT_YEAR_pism}-${END_YEAR_pism}"
+    CHUNK_DATE_TAG_pism="${CURRENT_YEAR_pism}0101-${END_YEAR_pism}1231"
     #CHUNK_DATE_TAG_awicm="${CHUNK_START_DATE_awicm}-${CHUNK_END_DATE_awicm}"
 
 #TODO Get the right file names for the forcing/extra and restart/output file names
     PISM_FORCING_EXTRA_FILE=../outdata/pism/${EXP_ID}_pismr_extra_${CHUNK_DATE_TAG_pism}.nc
-    PISM_RESTART_OUTPUT_FILE=../restart/pism/${EXP_ID}_pismr_out_${CHUNK_DATE_TAG_pism}.nc
+    #PISM_RESTART_OUTPUT_FILE=../restart/pism/${EXP_ID}_pismr_out_${CHUNK_DATE_TAG_pism}.nc
+    PISM_RESTART_OUTPUT_FILE=../restart/pism/${EXP_ID}_pismr_restart_${CHUNK_DATE_TAG_pism}.nc
     COMBINED_OUTPUT=ice_file_at_ocean.combined.nc
 
     # TODO Are these sensible choices?
