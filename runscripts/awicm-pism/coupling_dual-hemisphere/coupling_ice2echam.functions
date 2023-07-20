@@ -1235,11 +1235,11 @@ regrid_to_echam() {
         remapper=$2
 	if [[ "x$remapper" == "x" ]]; then
 	    #:org: remapper=remapcon2
+	    #remapper=remapdis #NOTE: Troubling for Greenland domain: strips in Pacific
 	    remapper=remapbil
-	    remapper=remapdis
 	fi
 	echo "                -   regridding $FILENAME to echam ${RES_echam} grid with $remapper"
-        cdo -s -P 28 \
+        cdo -s -P 28 -setmisstoc,0.0 \
                 -$remapper,${RES_echam}grid \
                 -setgrid,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                 $FILENAME ${FILENAME%.*}_${RES_echam}grid.nc
