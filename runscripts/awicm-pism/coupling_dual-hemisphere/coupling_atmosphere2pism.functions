@@ -1622,7 +1622,7 @@ latitude_varname='lat'
 time_varname='time'
 stddev=3.5
 obliquity=${obliquity_value}
-beta=${DEBM_BETA}
+!beta=10 is fixed, see MOD_MAIN.f90 !OLD:beta=${DEBM_BETA}
 /
 EOF
 #        cat -> ${COUPLE_DIR}/${PISM_HEMISPHERE}/namelist.debm << EOF
@@ -1640,7 +1640,7 @@ EOF
 # time_varname                          = 'time'
 # stddev                                =  3.5
 # obliquity                             =  ${obliquity_value}
-# beta                                  =  ${DEBM_BETA}
+# !beta                                  =  ${DEBM_BETA}
 #/
 #EOF
 
