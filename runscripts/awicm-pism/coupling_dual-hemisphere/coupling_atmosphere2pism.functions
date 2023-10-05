@@ -1622,9 +1622,27 @@ latitude_varname='lat'
 time_varname='time'
 stddev=3.5
 obliquity=${obliquity_value}
+cloud_bias=0.155  ! cloud bias
+Ans    = .845     ! Albedo for new snow
+Ads    = .73      ! Albedo for dry snow
+Aws    = .55      ! Albedo for wet snow
+tau_cs = .75      ! expected clear sky transmissivity
+residual = 0      ! residual heat flux (e.g. due to flux into the ice sheet
+hydmth_str = 4    ! For Northern Hemisphere=10, for Southern Hemisphere=4
 !beta=10 is fixed, see MOD_MAIN.f90 !OLD:beta=${DEBM_BETA}
 /
 EOF
+
+# # Needed by newer/current dEBM model version
+# cloud_bias=0.155  ! cloud bias
+# Ans    = .845     ! Albedo for new snow
+# Ads    = .73      ! Albedo for dry snow
+# Aws    = .55      ! Albedo for wet snow
+# tau_cs = .75      ! expected clear sky transmissivity
+# residual = 0      ! residual heat flux (e.g. due to flux into the ice sheet
+# hydmth_str = 10
+
+
 #        cat -> ${COUPLE_DIR}/${PISM_HEMISPHERE}/namelist.debm << EOF
 #& debm
 # xlen                                  = ${number_of_x_points}
@@ -1746,6 +1764,11 @@ ic_atm2debm_ablation_debm_run_execute_binary() {
             module load netcdf/4.6.0_intel
             module load intel.mpi
             module load intel.compiler
+        fi
+        if [[ $(which module 2> /dev/null) ]] ; then
+            echo "Loaded modules ..."
+            module list
+            echo
         fi
 
         ./$DEBM_BINARY > debm_stdout_stderr 2>&1 || cat debm_stdout_stderr
