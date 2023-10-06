@@ -1823,13 +1823,21 @@ ic_atm2debm_ablation_debm_run_execute_binary() {
         #todo:org:rm:    module load intel.mpi
         #todo:org:rm:    module load intel.compiler
         #todo:org:rm:fi
+	# Information about loaded modules and set paths and some env variables
+	DEBUG_no987398=1 #todo;activate for less logging information"
         if [[ $(which module 2> /dev/null) ]] ; then
-            echo "Loaded modules ..."
-            module list
 	    echo $(module list) > ${COUPLE_DIR}/${PISM_HEMISPHERE}/module.list
-            echo
+	    if [ $DEBUG_no987398 -gt 0 ] ; then
+		echo "Loaded modules ..."
+		module list
+		echo
+	    fi
         fi
-        echo "PATH=${PATH}; LD_LIBRARY_PATH=${LD_LIBRARY_PATH}; NETCDFFROOT=${NETCDFFROOT}"
+	if [ $DEBUG_no987398 -gt 0 ] ; then
+            echo -e "\t PATH=${PATH}"
+	    echo -e "\t LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
+	    echo -e "\t NETCDFFROOT=${NETCDFFROOT}"
+	fi
 
 	# Run dEBM binary
         ./$DEBM_BINARY > debm_stdout_stderr 2>&1 || cat debm_stdout_stderr
@@ -1849,6 +1857,100 @@ ic_atm2debm_ablation_debm_run_execute_binary() {
 }
 
 
+#todo:rm:org:## @fn ic_debm2pism_ablation_debm_make_surface_forcing_add_surface_temperature
+#todo:rm:org:## @brief
+#todo:rm:org:## generates a surface forcing that could passes down to PISM: dEBM output + air_temp
+#todo:rm:org:## dEBM ouput is generated from above functions
+#todo:rm:org:## air_temp is yearly mean air_temperature under zero degC calculated from echam output
+#todo:rm:org:ic_debm2pism_ablation_debm_make_surface_forcing_add_surface_temperature() {
+#todo:rm:org:        echo -e "\t\t- Adding yearly-averaged atmospheric surface temperature to surface given file"
+#todo:rm:org:        echo -e "\t\t  NOTE: this serves as a first-order estimate for surface temperature below the firn layer"
+#todo:rm:org:        cd ${COUPLE_DIR}/${PISM_HEMISPHERE}
+#todo:rm:org:
+#todo:rm:org:        debug_add_surface_temperature=${debug_add_surface_temperature:-0}
+#todo:rm:org:
+#todo:rm:org:        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
+#todo:rm:org:                echo -e "\t\t@ DEBUG: Getting air temperature"
+#todo:rm:org:        fi
+#todo:rm:org:        # select air_temperature
+#todo:rm:org:        #LA: change timmean to ymonmean
+#todo:rm:org:        $cdo -s \
+#todo:rm:org:                -ymonmean \
+#todo:rm:org:                -selvar,tsurf \
+#todo:rm:org:                ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
+#todo:rm:org:                tmp0 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+#todo:rm:org:                #${COUPLE_DIR}/${PISM_HEMISPHERE}/input_file_for_debm_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc \
+#todo:rm:org:                #-timmean \
+#todo:rm:org:                #-selvar,air_temp \
+#todo:rm:org:                #${COUPLE_DIR}/${PISM_HEMISPHERE}/input_file_for_debm_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc \
+#todo:rm:org:                #tmp0 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+#todo:rm:org:
+#todo:rm:org:        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
+#todo:rm:org:                echo -e "\t\t@ DEBUG: Determining temperature scale Kelvin vs Celsius"
+#todo:rm:org:        fi
+#todo:rm:org:
+#todo:rm:org:        $cdo -s \
+#todo:rm:org:                -setmisstoc,273.15 \
+#todo:rm:org:                -ifthen \
+#todo:rm:org:                -ltc,273.15 \
+#todo:rm:org:                tmp0 \
+#todo:rm:org:                tmp0 \
+#todo:rm:org:                tmp 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+#todo:rm:org:        $cdo -s \
+#todo:rm:org:                -setmisstoc,273.15 \
+#todo:rm:org:                tmp \
+#todo:rm:org:                tmp1 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+#todo:rm:org:
+#todo:rm:org:        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
+#todo:rm:org:                echo -e "\t\t@ DEBUG: Duplicating array 12x"
+#todo:rm:org:        fi
+#todo:rm:org:        ##  copy this array 12x so you have one for each month
+#todo:rm:org:        #LA: Not necessary anymore as we have now monthly output
+#todo:rm:org:        #$cdo -s \
+#todo:rm:org:        #        cat \
+#todo:rm:org:        #        tmp1 tmp1 tmp1 tmp1 tmp1 tmp1 \
+#todo:rm:org:        #        tmp6 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+#todo:rm:org:        #$cdo -s \
+#todo:rm:org:        #        cat \
+#todo:rm:org:        #        tmp6 tmp6 \
+#todo:rm:org:        #        tmp12 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+#todo:rm:org:        cp tmp1 tmp12
+#todo:rm:org:
+#todo:rm:org:        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
+#todo:rm:org:                echo -e "\t\t@ DEBUG: Setting time axis"
+#todo:rm:org:        fi
+#todo:rm:org:        $cdo -s \
+#todo:rm:org:                -settaxis,1000-01-16,12:00:00,1mon \
+#todo:rm:org:                tmp12 \
+#todo:rm:org:                ${COUPLE_DIR}/${PISM_HEMISPHERE}/air_temp_copy.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+#todo:rm:org:        #rm tmp0 tmp tmp1 tmp6 tmp12
+#todo:rm:org:        rm tmp0 tmp tmp1 tmp12
+#todo:rm:org:
+#todo:rm:org:        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
+#todo:rm:org:                echo -e "\t\t@ DEBUG: Multi-year monthly means"
+#todo:rm:org:        fi
+#todo:rm:org:        # merge air_temp with debm output files
+#todo:rm:org:        # & set time axies
+#todo:rm:org:        # PG: Why is this set to noon on the year 1000? Does that have any reason?
+#todo:rm:org:        $cdo -s \
+#todo:rm:org:                -ymonmean \
+#todo:rm:org:                -settaxis,1000-01-16,12:00:00,1mon \
+#todo:rm:org:                surface_mass_balance.nc \
+#todo:rm:org:                tmp 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+#todo:rm:org:
+#todo:rm:org:        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
+#todo:rm:org:                echo -e "\t\t@ DEBUG: Merge and clean up"
+#todo:rm:org:        fi
+#todo:rm:org:        $cdo -s -O \
+#todo:rm:org:                -merge \
+#todo:rm:org:                tmp \
+#todo:rm:org:                ${COUPLE_DIR}/${PISM_HEMISPHERE}/air_temp_copy.nc \
+#todo:rm:org:                ${COUPLE_DIR}/${PISM_HEMISPHERE}/smb.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+#todo:rm:org:        rm tmp
+#todo:rm:org:                cleanup_list="$cleanup_list ${COUPLE_DIR}/${PISM_HEMISPHERE}/air_temp_copy.nc"
+#todo:rm:org:                cd -
+#todo:rm:org:}
+
 ## @fn ic_debm2pism_ablation_debm_make_surface_forcing_add_surface_temperature
 ## @brief
 ## generates a surface forcing that could passes down to PISM: dEBM output + air_temp
@@ -1857,90 +1959,38 @@ ic_atm2debm_ablation_debm_run_execute_binary() {
 ic_debm2pism_ablation_debm_make_surface_forcing_add_surface_temperature() {
         echo -e "\t\t- Adding yearly-averaged atmospheric surface temperature to surface given file"
         echo -e "\t\t  NOTE: this serves as a first-order estimate for surface temperature below the firn layer"
+	here=$(pwd)
         cd ${COUPLE_DIR}/${PISM_HEMISPHERE}
 
-        debug_add_surface_temperature=${debug_add_surface_temperature:-0}
+	# Ensure idential lat/lon units
+	ncatted -h \
+		-a coordinates,tsurf,d,, \
+		${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
+		${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn2.nc
 
-        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
-                echo -e "\t\t@ DEBUG: Getting air temperature"
-        fi
-        # select air_temperature
-        #LA: change timmean to ymonmean
-        $cdo -s \
-                -ymonmean \
-                -selvar,tsurf \
-                ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn.nc \
-                tmp0 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-                #${COUPLE_DIR}/${PISM_HEMISPHERE}/input_file_for_debm_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc \
-                #-timmean \
-                #-selvar,air_temp \
-                #${COUPLE_DIR}/${PISM_HEMISPHERE}/input_file_for_debm_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc \
-                #tmp0 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
+        # Combine select air_temperature
+	$cdo -s -O -settaxis,1000-01-16,12:00:00,1mon \
+             -merge \
+	     -ymonmean surface_mass_balance.nc \
+	     -minc,273.15 -ymonmean -selvar,tsurf \
+             ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn2.nc \
+             ${COUPLE_DIR}/${PISM_HEMISPHERE}/smb.nc \
+	     2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
 
-        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
-                echo -e "\t\t@ DEBUG: Determining temperature scale Kelvin vs Celsius"
-        fi
+	# Add 'coordinates' attribute to all variables and, afterward,
+	# erase it for variable which should not have this attribute.
+	ncatted -h \
+		-a coordinates,,o,c,'lon lat' \
+		-a coordinates,lat,d,, \
+		-a coordinates,lon,d,, \
+		-a coordinates,time,d,, \
+		-a coordinates,time_2,d,, \
+		-a coordinates,x,d,, \
+		-a coordinates,y,d,, \
+		${COUPLE_DIR}/${PISM_HEMISPHERE}/smb.nc
 
-        $cdo -s \
-                -setmisstoc,273.15 \
-                -ifthen \
-                -ltc,273.15 \
-                tmp0 \
-                tmp0 \
-                tmp 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-        $cdo -s \
-                -setmisstoc,273.15 \
-                tmp \
-                tmp1 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-
-        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
-                echo -e "\t\t@ DEBUG: Duplicating array 12x"
-        fi
-        ##  copy this array 12x so you have one for each month
-        #LA: Not necessary anymore as we have now monthly output
-        #$cdo -s \
-        #        cat \
-        #        tmp1 tmp1 tmp1 tmp1 tmp1 tmp1 \
-        #        tmp6 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-        #$cdo -s \
-        #        cat \
-        #        tmp6 tmp6 \
-        #        tmp12 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-        cp tmp1 tmp12
-
-        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
-                echo -e "\t\t@ DEBUG: Setting time axis"
-        fi
-        $cdo -s \
-                -settaxis,1000-01-16,12:00:00,1mon \
-                tmp12 \
-                ${COUPLE_DIR}/${PISM_HEMISPHERE}/air_temp_copy.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-        #rm tmp0 tmp tmp1 tmp6 tmp12
-        rm tmp0 tmp tmp1 tmp12
-
-        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
-                echo -e "\t\t@ DEBUG: Multi-year monthly means"
-        fi
-        # merge air_temp with debm output files
-        # & set time axies
-        # PG: Why is this set to noon on the year 1000? Does that have any reason?
-        $cdo -s \
-                -ymonmean \
-                -settaxis,1000-01-16,12:00:00,1mon \
-                surface_mass_balance.nc \
-                tmp 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-
-        if [ "x${debug_add_surface_temperature}" == "x1" ]; then
-                echo -e "\t\t@ DEBUG: Merge and clean up"
-        fi
-        $cdo -s -O \
-                -merge \
-                tmp \
-                ${COUPLE_DIR}/${PISM_HEMISPHERE}/air_temp_copy.nc \
-                ${COUPLE_DIR}/${PISM_HEMISPHERE}/smb.nc 2>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism
-        rm tmp
-                cleanup_list="$cleanup_list ${COUPLE_DIR}/${PISM_HEMISPHERE}/air_temp_copy.nc"
-                cd -
+        cleanup_list="$cleanup_list ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn2.nc"
+        cd $here
 }
 
 ## @fn ic_debm2pism_ablation_debm_make_surface_forcing_apply_mask
@@ -1953,62 +2003,124 @@ ic_debm2pism_ablation_debm_make_surface_forcing_add_surface_temperature() {
 ##              then, fn will generate a glacial mask from PISM latest output
 ## 2) appply the above mask
 ic_debm2pism_ablation_debm_make_surface_forcing_apply_mask() {
-        echo -e "\t\t- Applying a mask"
+        here=$(pwd)
         cd ${COUPLE_DIR}/${PISM_HEMISPHERE}
-        # TODO/BUG (sxu): It looks like the mask we are getting is just 1 everywhere... is this correct?
 
-        debug_apply_ic_atm2debm_mask=${debug_apply_ic_atm2debm_mask:-0}
-        # create glacial mask according to the latest output by setting mask.nc 2 3 —> 1; 4 —>0
-        mask_file=mask.nc
-        if [ "x$RUN_NUMBER_pism" == "x1" ]; then
-                echo -e "\t\t- First run, you can specify to use DEBM_MASK_FILE to get the mask you want to use"
+        debug_apply_ic_atm2debm_mask=${debug_apply_ic_atm2debm_mask:-0
+	smb_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/smb.nc
+
+
+	if [  1 -eq 1 ] ; then
+	    echo -e "\t\t- Applying a mask"
+	    # Apply the mask
+            # create glacial mask according to the latest output by
+	    # setting mask.nc 2 3 —> 1; 4 —>0
+            mask_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/mask.nc
+            if [ "x$RUN_NUMBER_pism" == "x1" ]; then
+                echo -e "\t\t\t- First run, you can specify to use DEBM_MASK_FILE to get the mask you want to use"
                 DEBM_MASK_FILE=${DEBM_MASK_FILE:-${POOL_DIR_pism}/masks/${DOMAIN_pism}/${EXE_pism}_${DOMAIN_pism}_mask_${RES_pism}.nc}
-        else
+            else
                 $cdo -f nc -selvar,mask ${OUTPUT_DIR_pism}/latest_ex_file_pism.nc mask.nc
                 DEBM_MASK_FILE=mask.nc
-        fi
-        echo -e "\t\t- DEBM_MASK_FILE=${DEBM_MASK_FILE}"
-        $cdo -s selvar,mask -seltimestep,-1 ${DEBM_MASK_FILE} tmp.mask.nc; mv tmp.mask.nc mask.nc 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-        $cdo -s -lec,3 mask.nc tmp 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-        mv tmp ${mask_file}
+            fi
+            echo -e "\t\t\t  DEBM_MASK_FILE=${DEBM_MASK_FILE}"
+#todo:RM!:org        $cdo -s selvar,mask -seltimestep,-1 ${DEBM_MASK_FILE} tmp.mask.nc; mv tmp.mask.nc mask.nc 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+#todo:RM!:org        $cdo -s -lec,3 mask.nc tmp 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+#todo:RM!:org        mv tmp ${mask_file}
+	    mask_file_full=${COUPLE_DIR}/${PISM_HEMISPHERE}/mask_full.nc
+	    $cdo -O -setmisstoc,0 -lec,3 -selvar,mask -seltimestep,-1 \
+		$DEBM_MASK_FILE $mask_file_full
+	    $cdo -O -setmisstoc,0 remapnn,$smb_file \
+		 $mask_file_full $mask_file
+	    #TODO: A call at once
+	    #$cdo -O remapnn,$smb_file \
+		#     -setmisstoc,0 -lec,3 -selvar,mask -seltimestep,-1 \
+		#     $DEBM_MASK_FILE \
+		#     $mask_file
 
-        # apply mask
-        #for var in SNH MELT SMB REFR A air_temp; do
-        for var in SNH MELT SMB REFR A tsurf; do
-                #$cdo -s -f nc ifthen ${mask_file} -selvar,${var} smb.nc ${var} 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-                $cdo -s -f nc -selvar,${var} smb.nc ${var} 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-        done
-        #$cdo -s -O merge SNH MELT SMB REFR A air_temp surface_mass_balance_masked.nc 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-        $cdo -s -O merge SNH MELT SMB REFR A tsurf surface_mass_balance_masked.nc 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+	    #LIST_OF_DEBM_VARS="SNH MELT SMB REFR A air_temp"
+	    #LIST_OF_DEBM_VARS="SNH MELT SMB REFR A tsurf"
+	    LIST_OF_DEBM_VARS="SNH ME   SMB RZ   A tsurf"
+            # apply mask
+	    [ -f $smb_file ] && echo "Found $smb_file" || echo "MISSING $smb_file"
+            for var in ${LIST_OF_DEBM_VARS}; do
+		#$cdo -s -f nc ifthen ${mask_file} -selvar,${var} $smb_file ${var} 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+		$cdo -s -f nc -selvar,${var} $smb_file ${var} \
+		     1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+            done
+            # TODO/BUG (sxu): For right now, Paul is just filling in any missing
+            # values with a setmisstodis, maybe there is a better way to solve
+            # this?
+	    # IF WE APPLY a mask, we have to provide NONE NaNs outside
+            # of the not masked region.
+	    # Fast but maybe with artifical strips: -fillmiss2
+	    # More computational demanding but with distance depended: -setmisstodis
 
-        # TODO/BUG (sxu): For right now, Paul is just filling in any missing
-        # values with a setmisstodis, maybe there is a better way to solve
-        # this?
+            $cdo -s -O -fillmiss2 \
+		 -merge ${LIST_OF_DEBM_VARS} $mask_file \
+		 surface_mass_balance_masked.nc \
+		 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
 
-        #$cdo -s -O -setmisstodis surface_mass_balance_masked.nc tmp
+	    # Clean up
+	    echo -e "\t\t\t- Clean up"
+            for var in ${LIST_OF_DEBM_VARS} $smb_file; do
+		if [ -f $var ] ; then
+		    rm $var
+		    echo -e "\t\t\t\t - erase $var"
+		else
+		    echo -e "\t\t\t\t x miss  $var"
+		fi
+	    done
+	else
+	    echo -e "\t\t- Do NOT apply a mask, use entire field"
+	    cp surface_mass_balance.nc \
+	       surface_mass_balance_masked.nc
+	fi
 
-        # TODO(sxu) Not urgent, but we can use a cleanup list for this, that
-        # way we can have a debug step print it out if anything needs to get
-        # checked.
-        # make clean
-        #rm SNH MELT SMB REFR A air_temp
-        rm SNH MELT SMB REFR A tsurf
-        rm smb.nc
-        if [ ! -f ${COUPLE_DIR}/${PISM_HEMISPHERE}/${mask_file} ]; then
-                mv ${mask_file} ${COUPLE_DIR}/${PISM_HEMISPHERE}/
-        fi
+
         if [ "x${debug_apply_ic_atm2debm_mask}" == "x1" ]; then
                 echo -e "\t\t@ DEBUG: Opening the results in ncview for you"
                 # Put this in the background, or it blocks the rest of the script
 		# If not running interactively, don't do anything: [ -z "$PS1" ]
-		[ -z "$PS1" ] || ncview surface_mass_balance_masked.nc &
+		if [ -z "$PS1" ] ; then
+		    echo -e "\t\t\t Skip not an active shell"
+		else
+		    echo -e "\t\t\t Open ncview in the background"
+		    ncview surface_mass_balance_masked.nc &
+		fi
         fi
 
+	if [ ! -f surface_mass_balance_masked.nc ] ; then
+	    echo "*** MISSING surface_mass_balance_masked.nc"
+	    echo "*** cp surface_mass_balance.nc surface_mass_balance_masked.nc"
+	    cp surface_mass_balance.nc surface_mass_balance_masked.nc
+	    # TODO:rm:debugging code
+	    echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
+	    pwd
+	    ls -lrt
+	    echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
+	fi
+
         $cdo -splitname \
-                surface_mass_balance_masked.nc \
-                ${COUPLE_DIR}/${PISM_HEMISPHERE}/debm_output_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}_\
-                1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
-        cd -
+             surface_mass_balance_masked.nc \
+             ${COUPLE_DIR}/${PISM_HEMISPHERE}/debm_output_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}_ \
+             1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+
+	# Debugging:todo:rm:
+	[ -f surface_mass_balance_masked.nc ] && echo "+OK surface_mass_balance_masked.nc" || echo "-MISS surface_mass_balance_masked.nc"
+	echo "pwd : $(pwd)"
+	for var in $($cdo showvar surface_mass_balance_masked.nc) ; do
+	    echo "= $var : ${COUPLE_DIR}/${PISM_HEMISPHERE}/debm_output_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}_$var.nc"
+	done
+	for var in ${COUPLE_DIR}/${PISM_HEMISPHERE}/debm_output_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}_*.nc ; do
+	    if [ -f $var ] ; then
+		echo "+ $(ls -l $var)"
+	    else
+		echo "- MISSING $var"
+	    fi
+	done
+
+        cd $here
 }
 
 
@@ -2020,7 +2132,7 @@ ic_debm2pism_ablation_debm_make_surface_forcing_apply_mask() {
 ## Sets air_temp to ice_surface_temp
 ic_debm2pism_ablation_debm_make_surface_forcing_set_temperature_varname_and_units() {
         echo -e "\t\t- Setting variable name and unit for temperature"
-        echo -e "\t\t- In surface_given variant, this corresponds to firn temperature"
+        echo -e "\t\t  In surface_given variant, this corresponds to firn temperature"
 
         #debm_ice_temp_varname="air_temp"
         debm_ice_temp_varname="tsurf"
