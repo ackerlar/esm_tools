@@ -1928,11 +1928,11 @@ ic_atm2debm_ablation_debm_run_execute_binary() {
         ./$DEBM_BINARY > debm_stdout_stderr 2>&1 || cat debm_stdout_stderr
 
 	# Copy dEBM output to standard name
-	if [ -f surface_mass_balance.nc ] ; then
-	    cp surface_mass_balance.nc \
-	       ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_mass_balance_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc
-	else
+	if [ ! -f surface_mass_balance.nc ] ; then
 	    echo -e "\t\t\t Missing dEBM output 'surface_mass_balance.nc'"
+	else # TODO:Deactivate:cp
+	    $cdo -f nc4c -z zip3 copy surface_mass_balance.nc \
+	       ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_mass_balance_dEBM_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc4
 	fi
 
         #todo:org:rm:if [ "${MACHINE}" == "ollie" ]; then
@@ -2057,7 +2057,7 @@ ic_debm2pism_ablation_debm_make_surface_forcing_add_surface_temperature() {
         # Combine select air_temperature
         $cdo -s -O -settaxis,1000-01-16,12:00:00,1mon \
              -merge \
-             -ymonmean surface_mass_balance.nc \
+             surface_mass_balance.nc \
              -minc,273.15 -ymonmean -selvar,tsurf \
              ${COUPLE_DIR}/${PISM_HEMISPHERE}/temperature_below_firn2.nc \
              ${COUPLE_DIR}/${PISM_HEMISPHERE}/smb.nc \
@@ -2090,7 +2090,6 @@ ic_debm2pism_ablation_debm_make_surface_forcing_add_surface_temperature() {
 ## 2) appply the above mask
 ic_debm2pism_ablation_debm_make_surface_forcing_apply_mask() {
         echo -en "\t\t- Applying a mask: "
-        set -x #TODO:rm
         here=$(pwd)
         cd ${COUPLE_DIR}/${PISM_HEMISPHERE}
 
@@ -2099,69 +2098,81 @@ ic_debm2pism_ablation_debm_make_surface_forcing_apply_mask() {
 
         if [  1 -eq 1 ] ; then
             echo "Masking region where dEBM values are used"
-            # Apply the mask
-            # create glacial mask according to the latest output by
-            # setting mask.nc 2 3 —> 1; 4 —>0
+            # Apply the mask and create glacial mask according to the
+	    # latest output by setting mask.nc 2 3 -> 1; 4 ->0
             mask_file=${COUPLE_DIR}/${PISM_HEMISPHERE}/mask.nc
             if [ "x$RUN_NUMBER_pism" == "x1" ]; then
                 echo -e "\t\t\t- First run, you can specify to use DEBM_MASK_FILE to get the mask you want to use"
                 DEBM_MASK_FILE=${DEBM_MASK_FILE:-${POOL_DIR_pism}/masks/${DOMAIN_pism}/${EXE_pism}_${DOMAIN_pism}_mask_${RES_pism}.nc}
             else
-                $cdo -f nc -selvar,mask ${OUTPUT_DIR_pism}/latest_ex_file_pism.nc mask.nc
-                DEBM_MASK_FILE=mask.nc
+                $cdo -f nc -selvar,mask ${OUTPUT_DIR_pism}/latest_ex_file_pism.nc $mask_file
+                DEBM_MASK_FILE=${mask_file}
             fi
             echo -e "\t\t\t  DEBM_MASK_FILE=${DEBM_MASK_FILE}"
 #todo:RM!:org        $cdo -s selvar,mask -seltimestep,-1 ${DEBM_MASK_FILE} tmp.mask.nc; mv tmp.mask.nc mask.nc 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
 #todo:RM!:org        $cdo -s -lec,3 mask.nc tmp 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
 #todo:RM!:org        mv tmp ${mask_file}
-            mask_file_full=${COUPLE_DIR}/${PISM_HEMISPHERE}/mask_full.nc
-            $cdo -O -setmisstoc,0 -lec,3 -selvar,mask -seltimestep,-1 \
+            mask_file_full=${mask_file%%.nc}_global.nc
+            $cdo -s -O -b F64 -setmisstoc,0 \
+		 -lec,3 -selvar,mask -seltimestep,-1 \
                 $DEBM_MASK_FILE $mask_file_full
-            $cdo -O -setmisstoc,0 remapnn,$smb_file \
+            $cdo -s -O -P 8 -b F64 -setmisstoc,0 \
+		 -remapnn,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
                  $mask_file_full $mask_file
             #TODO: A call at once
-            #$cdo -O remapnn,$smb_file \
-                #     -setmisstoc,0 -lec,3 -selvar,mask -seltimestep,-1 \
-                #     $DEBM_MASK_FILE \
-                #     $mask_file
+	    #$cdo -s -O -P 8 -b F64 \
+	    #	 -remapnn,${COUPLE_DIR}/${PISM_HEMISPHERE}/ice.griddes \
+            #     -setmisstoc,0 -lec,3 -selvar,mask -seltimestep,-1 \
+            #     $DEBM_MASK_FILE \
+            #     $mask_file
 
             #LIST_OF_DEBM_VARS="SNH MELT SMB REFR A air_temp"
             #LIST_OF_DEBM_VARS="SNH MELT SMB REFR A tsurf"
             LIST_OF_DEBM_VARS="SNH ME   SMB RZ   A tsurf"
             # apply mask
-            [ -f $smb_file ] && echo "Found $smb_file" || echo "MISSING $smb_file"
+            [ -f $smb_file ] && echo "Found $smb_file" || echo "MISSING $smb_file" #todo:rm
             for var in ${LIST_OF_DEBM_VARS}; do
                 #$cdo -s -f nc ifthen ${mask_file} -selvar,${var} $smb_file ${var} 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
                 $cdo -s -f nc -selvar,${var} $smb_file ${var} \
                      1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
             done
+            $cdo -s -O \
+                 -merge ${LIST_OF_DEBM_VARS} $mask_file \
+                 surface_mass_balance_masked.nc \
+                 1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
+
             # TODO/BUG (sxu): For right now, Paul is just filling in any missing
             # values with a setmisstodis, maybe there is a better way to solve
             # this?
             # IF WE APPLY a mask, we have to provide NONE NaNs outside
             # of the not masked region.
-            # Fast but maybe with artifical strips: -fillmiss2
-            # More computational demanding but with distance depended: -setmisstodis
-
-            $cdo -s -O -fillmiss2 \
-                 -merge ${LIST_OF_DEBM_VARS} $mask_file \
-                 surface_mass_balance_masked.nc \
+            # Fast but maybe with artifical strips:
+	    #   -fillmiss2
+            # More computational demanding but with distance depended:
+	    #   -setmisstodis
+	    #
+	    mv surface_mass_balance_masked.nc \
+	       surface_mass_balance_masked_raw.nc
+	    #$cdo -s -O -fillmiss2 \
+	    $cdo -s -O -P 8 -setmisstodis \
+		 surface_mass_balance_masked_raw.nc \
+		 surface_mass_balance_masked.nc \
                  1>> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_atm2pism 2>&1
 
-            # Clean up
-            echo -e "\t\t\t- Clean up"
-            for var in ${LIST_OF_DEBM_VARS} $smb_file; do
-                if [ -f $var ] ; then
-                    rm $var
-                    echo -e "\t\t\t\t - erase $var"
-                else
-                    echo -e "\t\t\t\t x miss  $var"
-                fi
-            done
+            ## Clean up TODO:Activate
+            #echo -e "\t\t\t- Clean up"
+            ##for var in ${LIST_OF_DEBM_VARS} $smb_file; do
+	    #for var in ${LIST_OF_DEBM_VARS} ; do
+            #    if [ -f $var ] ; then
+            #        rm $var
+            #        echo -e "\t\t\t\t - erase $var"
+            #    else
+            #        echo -e "\t\t\t\t x miss  $var"
+            #    fi
+            #done
         else
             echo "Use dEBM values across the entire domain (equals skipping a mask)"
-            cp surface_mass_balance.nc \
-               surface_mass_balance_masked.nc
+            cp $smb_file surface_mass_balance_masked.nc
         fi
 
         if [ "x${debug_apply_ic_atm2debm_mask}" == "x1" ]; then
@@ -2179,7 +2190,7 @@ ic_debm2pism_ablation_debm_make_surface_forcing_apply_mask() {
         if [ ! -f surface_mass_balance_masked.nc ] ; then
             echo "*** MISSING surface_mass_balance_masked.nc"
             echo "*** cp surface_mass_balance.nc surface_mass_balance_masked.nc"
-            cp surface_mass_balance.nc surface_mass_balance_masked.nc
+            cp $smb_file surface_mass_balance_masked.nc
             # TODO:rm:debugging code
             echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
             pwd
@@ -2208,9 +2219,7 @@ ic_debm2pism_ablation_debm_make_surface_forcing_apply_mask() {
 # Debugging:todo:rm:END
 
         cd $here
-	set +x #TODO:rm
 }
-
 
 
 ## @fn ic_debm2pism_ablation_debm_make_surface_forcing_set_temperature_varname_and_units
@@ -2249,7 +2258,8 @@ ic_debm2pism_ablation_debm_make_surface_forcing_set_smb_varname_and_units() {
                 units,${pism_mass_balance_varname},o,c,"kg m-2 s-1" \
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/debm_output_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}_${debm_mass_balance_varname}.nc \
                 tmp_${debm_mass_balance_varname}
-        cp tmp_${debm_mass_balance_varname} ${COUPLE_DIR}/${PISM_HEMISPHERE}/uta_tmp_${debm_mass_balance_varname}
+#todo:rm        cp tmp_${debm_mass_balance_varname} \
+#todo:rm	   ${COUPLE_DIR}/${PISM_HEMISPHERE}/uta_tmp_${debm_mass_balance_varname}
         mv tmp_${debm_mass_balance_varname} \
                 ${COUPLE_DIR}/${PISM_HEMISPHERE}/debm_output_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}_${debm_mass_balance_varname}.nc
 }
@@ -2285,7 +2295,8 @@ ic_debm2pism_ablation_debm_make_surface_forcing_set_time_axis() {
                 echo "                -   assuming MONTHLY MEANS (for now -- using 30 equivalent days per month)"
                 time_calendar="360_day"
         fi
-        cp ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc ${COUPLE_DIR}/uta_dummy.nc
+#todo:rm        cp ${COUPLE_DIR}/${PISM_HEMISPHERE}/surface_given_file_${CHUNK_START_DATE_pism}-${CHUNK_END_DATE_pism}.nc \
+#todo:rm			    ${COUPLE_DIR}/uta_dummy.nc
         ncatted \
                 -a \
                 bounds,time,o,c,"time_bnds" \
