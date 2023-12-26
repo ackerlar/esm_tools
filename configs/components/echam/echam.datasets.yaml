@@ -30,15 +30,15 @@ forcing_sources:
         "piaerocoarse": "${forcing_dir}/aero/${resolution}_aeropt_kinne_sw_b14_coa.nc"
         "piaerofarir": "${forcing_dir}/aero/${resolution}_aeropt_kinne_lw_b16_coa.nc"
         "piaerofin": "${forcing_dir}/aero/${resolution}_aeropt_kinne_sw_b14_fin_1865.nc"
-        
-        "histaerocoarse": 
+
+        "histaerocoarse":
             "${forcing_dir}/aero/${resolution}_aeropt_kinne_sw_b14_coa.nc":
                 to: 1864
             "${forcing_dir}/aero/${resolution}_aeropt_kinne_sw_b14_coa_@YEAR@.nc":
                 from: 1865
                 to: 2000
-                
-        "histaerofarir": 
+
+        "histaerofarir":
             "${forcing_dir}/aero/${resolution}_aeropt_kinne_lw_b16_coa.nc":
                 to: 1864
             "${forcing_dir}/aero/${resolution}_aeropt_kinne_lw_b16_coa_@YEAR@.nc":
@@ -80,7 +80,9 @@ forcing_sources:
                 "${greenhouse_dir}/greenhouse_${scenario}.nc":
                         from: 2015
 
-        "1percCO2greenh": "${greenhouse_dir}/greenhouse_1pctCO2.nc"
+        "1percCO2greenh": "${greenhouse_dir}/greenhouse_1pctCo2.nc" #SPELLING
+        #"1percCO2greenh": "${greenhouse_dir}/greenhouse_1pctCO2.nc" #ORG
+
         # radiation
         "histswflux":
                 "${input_dir}/solar_irradiance/swflux_14band_1850.nc":
@@ -119,4 +121,3 @@ forcing_sources:
                          to: 2014
                  "${input_dir}/MAC-SP_${scenario}.nc":
                          from: 2015
-
