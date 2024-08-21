@@ -42,4 +42,3 @@ nesh:
                - 'neshcl*'
                - 'nesh-bigmem*'
         post_nodes: 'neshcl*'
-

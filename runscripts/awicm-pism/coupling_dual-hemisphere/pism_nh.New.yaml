@@ -1,0 +1,131 @@
+general:
+        setup_name: pism_nh
+        compute_time: "00:40:00"
+        initial_date: "8100-01-01"
+        final_date: "8500-12-31"
+        base_dir: "/work/ab0246/a270096/esm-experiments/"
+        nyear: 10
+        #clean_old_rundirs_keep_every: 5
+        #clean_old_rundirs_except: 2
+        files_to_wait_for:
+            - "pism_nh/latest_atmo_forcing_file.nc"
+            - "pism_nh/latest_ocean_forcing_file.nc"
+        use_venv: False
+
+pism_nh:
+        version: "github1.2.1"
+        #:org:nhem:resolution: "10km"
+        resolution: "5km"
+        # model_dir: "/home/a/a270096/pism_dependencies/pism-1.1.4-qoohpi/"
+        model_dir: "/home/a/a270124/pism_dependencies/pism-1.1.4-qoohpi/"
+        lresume: 1
+
+        ###################
+        # Settings for AWIES - PISM coupling
+        # Ocean ablation methode
+        ocean_ablation_method: "OCEANTEMPSALT"
+        # DEBM
+        ablation_method: "DEBM"
+        debm_path: "/home/a/a270124/dEBM/Fortran-v1.0/dEBMmain"
+        debm_obl: "22.944859"
+        debm_beta: 7.5
+        # lapse rate
+        lapse_rate: -0.005
+        iceberg_coupling: False
+        thk_threshold: 5.0
+        select_min_glacial_depth: True
+        reduce_temp: True
+        reduce_temp_by: "anom"
+        temp2_bias_file: "/work/ba0989/a270124/PalModII/data_set/temp2.ncep.1948-1980.ymonmean.bil.bias.nc"
+        prec_anom: True
+        prec_bias_file: "/work/ba0989/a270124/PalModII/data_set/prec.bias.ncep.con.nc"
+        # Anomaly coupling
+        #todo_DEL ANOMALY_AIR_TEMPERATURE: False
+        #todo_DEL ANOMALY_PRECIPITATION: False
+        #todo_DEL ANOMALY_OCEAN_TEMPERATURE: False
+        #todo_DEL ANOMALY_OCEAN_SALINITY: False
+        ###################
+
+        ini_parent_exp_id: "bla"
+        ini_parent_date: "1-1-1"
+        ini_restart_dir: "bla"
+        #CCR spinup_file: Start at time0
+        #TODO#old#spinup_file: "/work/ba0989/a270124/PalModII/experiments/_old/PI_bootstrap/restart/pism/PI_bootstrap_pismr_restart_10000101-10091231.nc"
+        #:org:nhem:spinup_file: "/work/ba1347/PISM/initial/NHEM/PI_bootstrap_pismr_restart_10000101-10091231.nc"
+        #:org:nhem:pool_dir: "/work/ba1066/a270124/pool_pism/"
+        spinup_file: "/work/ba1347/PISM/initial/GrIS_nhem/GrIS_bootstrap_pismr_restart_05km.nc"
+        pool_dir: "/work/ba1347/PISM/pool_pism_cr/"
+        ts_interval: "1"
+        ex_interval: "monthly"
+        #:org:nhem:domain: "nhem"
+        domain: "gris_nhem"
+        force_bootstrap_first_run: False
+
+        kv_pairs:
+                stress_balance.model: "ssa+sia"
+                stress_balance.sia.max_diffusivity: 800
+                sia_e: 3.0
+                ssa_e: 1.0
+                basal_resistance.pseudo_plastic.q: 0.5
+                basal_resistance.pseudo_plastic.u_threshold: 100
+                basal_yield_stress.mohr_coulomb.till_effective_fraction_overburden: 0.01
+                basal_yield_stress.mohr_coulomb.till_phi_default: 30
+                basal_yield_stress.mohr_coulomb.till_cohesion: 0
+                basal_yield_stress.mohr_coulomb.till_compressibility_coefficient: 0.12
+                hydrology.tillwat_max: 1
+                bed_deformation.model: "lc"
+                bed_deformation.lc.update_interval: 1
+                calving.methods: 'eigen_calving,thickness_calving'
+                calving.thickness_calving.threshold: 200
+                #:org:nhem:geometry.front_retreat.prescribed.file: "/work/ba1066/a270124/pool_pism/masks/nhem/pismr_nhem_10km_no-tibet_mask.nc"
+                geometry.front_retreat.prescribed.file: "/work/ba1347/PISM/initial/GrIS_nhem/OceanMasks_10km.nc"
+                ocean.pik_melt_factor: "1e-2"
+                atmosphere.elevation_change.precip_lapse_rate: 0.0
+                atmosphere.elevation_change.smb_lapse_rate: 0.0
+                # PICO switches
+
+        flags:
+                #- "bootstrap"
+                #- "allow_extrapolation"
+                - "pik"
+                - "basal_resistance.pseudo_plastic.enabled"
+                - "basal_yield_stress.slippery_grounding_lines"
+
+        couplers:
+                #Not-with-dEBM!#atmosphere:
+                #Not-with-dEBM!#    given:
+                #Not-with-dEBM!#        files:
+                #Not-with-dEBM!#            atmosphere_given_file: "latest_atmo_forcing_file.nc"
+                #Not-with-dEBM!#        kv_pairs:
+                #Not-with-dEBM!#            atmosphere_given_period: 1
+                surface:
+                    given:
+                        files:
+                            surface_given_file: "latest_atmo_forcing_file.nc"
+                        kv_pairs:
+                            surface_given_period: 1
+                ocean:
+                    th:
+                        files:
+                            ocean_th_file: "latest_ocean_forcing_file.nc"
+
+        workflow:
+                next_run_triggered_by: couple_out
+                subjobs:
+                        couple_in:
+                                nproc: 1
+                                run_before: prepcompute
+                                script: coupling_awiesm2pism.functions
+                                script_dir: "/home/a/a270096/awi.src/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere"
+                                call_function: awiesm2pism
+                                env_preparation: env_pism.py
+                                run_only: first_run_in_chunk
+                                #skip_chunk_number: 1
+                        couple_out:
+                                nproc: 1
+                                run_after: tidy
+                                script: coupling_pism2awiesm.functions
+                                script_dir: "/home/a/a270096/awi.src/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere"
+                                call_function: pism2awiesm
+                                env_preparation: env_pism2awiesm.py
+                                run_only: last_run_in_chunk

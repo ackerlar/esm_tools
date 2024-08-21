@@ -1,12 +1,12 @@
 def prepare_environment(config):
     default_input_grid = config["general"]["experiment_couple_dir"] +"/ice.griddes"
     environment_dict = {
-            "PISM_TO_OCEAN": 0,
+            "PISM_TO_OCEAN": 1,
             "OCEAN_TO_PISM": int(config["general"]["first_run_in_chunk"]),
             "COUPLE_DIR": config["general"]["experiment_couple_dir"],
             "VERSION_pism": config[config["general"]["setup_name"]]["version"].replace("github", "").replace("index", "").replace("snowflake", "")[:3],
             "POOL_DIR_pism": config[config["general"]["setup_name"]]["pool_dir"],
-            
+
             "YR0_pism": config["general"]["start_date"].syear,
             "M0_pism": config["general"]["start_date"].smonth,
             "D0_pism": config["general"]["start_date"].sday,
@@ -14,45 +14,54 @@ def prepare_environment(config):
             "END_YEAR_pism": config["general"]["end_date"].syear,
             "END_MONTH_pism": config["general"]["end_date"].smonth,
             "END_DAY_pism": config["general"]["end_date"].sday,
-            
+
             "CURRENT_YEAR_pism": config["general"]["current_date"].syear,
-            "EX_INT": config[config["general"]["setup_name"]]["ex_interval"], 
+            "EX_INT": config[config["general"]["setup_name"]]["ex_interval"],
             "RUN_NUMBER_pism": config["general"]["run_number"],
             "CHUNK_START_DATE_pism": config["general"]["chunk_start_date"],
             "CHUNK_END_DATE_pism": config["general"]["chunk_end_date"],
             "CHUNK_START_YEAR_pism": config["general"]["chunk_start_date"].syear,
             "CHUNK_END_YEAR_pism": config["general"]["chunk_end_date"].syear,
             "EXP_ID": config["general"]["command_line_config"]["expid"],
-            #"ICEBERG_DIR": config["general"]["iceberg_dir"], 
+            #"ICEBERG_DIR": config["general"]["iceberg_dir"],
             "OUTPUT_DIR_pism": config[config["general"]["setup_name"]]["experiment_outdata_dir"],
             "SPINUP_FILE_pism": config[config["general"]["setup_name"]]["spinup_file"],
             #"MESH_DIR_fesom": config["general"]["mesh_dir"],
             "FUNCTION_PATH": config[config["general"]["setup_name"]]["workflow"]["subjobs"]["couple_in"]["script_dir"],
             "CHUNK_SIZE_pism_standalone": config["model2"]["chunk_size"],
-            #"iter_coup_interact_method_ice2oce": "BASALSHELF_WATER_ICEBERG_MODEL",
+            #TODO:ORG:LA#rm#"iter_coup_interact_method_ice2oce": "BASALSHELF_WATER_ICEBERG_MODEL",
+            #TODO:CCR:Future:"iter_coup_interact_method_ice2oce": "BASALSHELF_WATER_ICEBERG_WATERHEAT",
+            #TODO:RM:test002#"iter_coup_interact_method_ice2oce": "BASALSHELF_WATER_ICEBERG_WATER",
+            "iter_coup_interact_method_ice2oce": "BASALSHELF_WATER_ICEBERG_WATERHEAT",
+            "iter_coup_interact_method_oce2ice": config[config["general"]["setup_name"]].get("ocean_ablation_method", "OCEANTEMPSALT"),
             "MACHINE": config["computer"]["name"],
             "DOMAIN_pism": config[config["general"]["setup_name"]]["domain"],
             "RES_pism": config[config["general"]["setup_name"]]["resolution"],
             "EXE_pism": config[config["general"]["setup_name"]]["executable"],
             "iterative_coupling_atmosphere_pism_ablation_method": config[config["general"]["setup_name"]]["ablation_method"],
             "DEBM_EXE": config[config["general"]["setup_name"]]["debm_path"],
-            "MY_OBLIQUITY": config[config["general"]["setup_name"]]["debm_obl"], 
+            "MY_OBLIQUITY": config[config["general"]["setup_name"]]["debm_obl"],
             "DEBM_BETA": config[config["general"]["setup_name"]].get("debm_beta", 10),
-            "iterative_coupling_atmosphere_pism_regrid_method": config[config["general"]["setup_name"]].get("regrid_method", "DOWNSCALE"), 
-            "REDUCE_TEMP": int(config[config["general"]["setup_name"]].get("reduce_temp", 0)), 
-            "REDUCE_TEMP_BY": config[config["general"]["setup_name"]].get("reduce_temp_by", 1), 
+            "iterative_coupling_atmosphere_pism_regrid_method": config[config["general"]["setup_name"]].get("regrid_method", "DOWNSCALE"),
+            "REDUCE_TEMP": int(config[config["general"]["setup_name"]].get("reduce_temp", 0)),
+            "REDUCE_TEMP_BY": config[config["general"]["setup_name"]].get("reduce_temp_by", 1),
             "PISM_HEMISPHERE": config["general"]["setup_name"],
-            #"PISM_OCEAN_PICO_BASINS_FILE": "/home/ollie/lackerma/pool_pism/basins/antarctica.16km.nc",
+            "ANOMALY_AIR_TEMPERATURE": int(config[config["general"]["setup_name"]].get("ANOMALY_AIR_TEMPERATURE", 0)),
+            "ANOMALY_PRECIPITATION": int(config[config["general"]["setup_name"]].get("ANOMALY_PRECIPITATION", 0)),
+            "ANOMALY_OCEAN_TEMPERATURE": int(config[config["general"]["setup_name"]].get("ANOMALY_OCEAN_TEMPERATURE", 0)),
+            "ANOMALY_OCEAN_SALINITY": int(config[config["general"]["setup_name"]].get("ANOMALY_OCEAN_SALINITY", 0)),
+            "PISM_OCEAN_PICO_BASINS_FILE": config[config["general"]["setup_name"]].get("PICO_basins_only_file", config["general"]["setup_name"]+"/latest_ocean_forcing_file.nc"),
+
+            "REFERENCE_ATMOS_FNAME": config[config["general"]["setup_name"]].get("REFERENCE_ATMOS_FNAME", "/work/ab0246/a270096/share/pism/ANT.16km/ATMForcing.piControl.16km.nc"),
+            "BASE_STATE_ATMOS_FNAME": config[config["general"]["setup_name"]].get("BASE_STATE_ATMOS_FNAME", "/work/ab0246/a270096/share/pism/ANT.16km/atmo_given_file_base_state.pism_sh.nc"),
+            "REFERENCE_OCEAN_FNAME": config[config["general"]["setup_name"]].get("REFERENCE_OCEAN_FNAME", "/work/ab0246/a270096/share/pism/ANT.16km/OCEForcing.piControl.16km.nc"),
+            "BASE_STATE_OCEAN_FNAME": config[config["general"]["setup_name"]].get("BASE_STATE_OCEAN_FNAME", "/work/ab0246/a270096/share/pism/ANT.16km/ocean_forcing4pism_base_state.pism_sh.nc"),
 
             #"RESTART_DIR_pism": config[config["general"]["setup_name"]]["experiment_restart_in_dir"],
             #"ice_bedrock_change_file": (
             #    config["general"]["experiment_couple_dir"] +
             #    "/bedrock_change.nc"
             #    ),
-            #"DOMAIN_pism": config[config["general"]["setup_name"]]["domain"],
-            #"EXE_pism": config[config["general"]["setup_name"]]["executable"],
-            #"RES_pism": config[config["general"]["setup_name"]]["resolution"],
-            #"RUN_NUMBER_pism" : config["general"]["run_number"],
             #"pism_solidearth_initialize_method": config[config["general"]["setup_name"]]["solidearth_initialize_method"],
             #"pism_solidearth_initialize_dummyrun_file": config[config["general"]["setup_name"]].get("solidearth_initialize_dummyrun_file", ""),
             #"INPUT_GRID_pism": config[config["general"]["setup_name"]].get("input_grid", default_input_grid),
@@ -68,9 +77,3 @@ def prepare_environment(config):
             }
     print (environment_dict)
     return environment_dict
-
-
-
-
-
-

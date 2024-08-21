@@ -3,14 +3,19 @@
 function fesom2ice {
     FESOM_TO_ISM_ocean_forcing=${FESOM_TO_ISM_ocean_forcing:-0}
     echo " *** S T A R T I N G    fesom2ice *** "
-    
+
     if [ ${MACHINE} == "ollie" ]; then
         module unload nco
         module load nco/4.7.5-gcc64
     fi
 
     module load python3
-    module load cdo
+    if [ $(type -p cdo) ] ; then
+        echo "Use existing 'cdo'"
+    else
+        echo "Load 'cdo' module"
+        module load cdo
+    fi
 
     . ${FUNCTION_PATH}/general_lists.functions
     . ${FUNCTION_PATH}/coupling_general.functions
@@ -234,14 +239,14 @@ function fesom_ice_construct_input_list {
 
         unset variable year month #current_file start_year_couple end_year_couple
 }
-   
+
 function fesom_ice_select_relevant_variables {
     echo ""; echo " *   selecting relevant variables"
     fesom1x_file3D_T_list_for_ice=""
     fesom1x_file3D_S_list_for_ice=""
     fesom1x_file2D_list_for_ice=""
     fesom1x_file2Dstatic_list_for_ice=""
-    
+
     variable=temp
     for file in ${fesom1x_raw_file3D_T_list_for_ice} ; do
 	echo -n "     - >${variable}< from ${file}"
@@ -313,13 +318,17 @@ function fesom_ice_fesom_build_grid_with_lonlat_depth {
 	    base_dir=$(basename $dir)
 	    echo -n "     - $base_dir"
 	    if [ ! -d $base_dir ] ; then
-		echo " - create link"
-		ln -s $dir
+		if [ -L $base_dir ] ; then
+                    echo " - reuse existing link"
+                else
+                    echo " - create new link"
+                    ln -fs $dir
+		fi
 	    else
 		echo " - exists in $(pwd)"
 	    fi
 	done
-        
+
         processed_fesom1x_file3D_T_list_for_ice=""
         processed_fesom1x_file3D_S_list_for_ice=""
         processed_fesom1x_file2D_list_for_ice=""
@@ -383,7 +392,7 @@ function fesom_ice_fesom_build_grid_with_lonlat_depth {
 	    echo "     ## Do not activate HOT fix"
 	    echo "=====## ---------------------------------------------------------------"
 	fi
-        
+
         # Several things might be needed for pyfesom. If it isn't installed;
         # get it
         #module unload python
@@ -412,7 +421,7 @@ function fesom_ice_fesom_build_grid_with_lonlat_depth {
             module load miniconda
             module load proj/5.1.0
         fi
-        
+
         variable=temp
         for file in ${fesom1x_file3D_T_list_for_ice} ; do
                 filename=$(basename $file) ; logfile=${filename}.${variable}.log

@@ -1,8 +1,8 @@
 #!/usr/bin/ksh
 
-function pism2atmosphere {
+function pism4empty2atmosphere {
         echo "                =================================================================="
-        echo "                 *** S T A R T I N G    pism2atmosphere *** "; echo
+        echo "                 *** S T A R T I N G    pism4empty2atmosphere *** "; echo
 
         :> ${COUPLE_DIR}/${PISM_HEMISPHERE}/cdo_stderr_pism2atm
 
@@ -20,7 +20,7 @@ function pism2atmosphere {
                 echo " NOT generating ice forcing for atmosphere"
         fi
         echo
-        echo "                 *** F I N I S H E D    pism2atmosphere *** "
+        echo "                 *** F I N I S H E D    pism4empty2atmosphere *** "
         echo "                =================================================================="
 }
 function iterative_coupling_pism_atmosphere_make_forcing {
@@ -165,6 +165,15 @@ function pism_atmosphere_assemble_final_file {
         files_needed="${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_mask_current.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_orog_difference.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_runoff_flux_total.nc ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_runoff_kg_m-2_s-1.nc"
         cdo -s -O merge $files_needed ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.nc
 	ncwa -a time ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.nc tmp; mv tmp ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.nc
+		
+	# CCR
+	mv ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.nc \
+	   ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.NOT_USED.${END_YEAR_pism}.nc
+	cdo -mulc,0 -delvar,lon_2,lat_2 \
+	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.NOT_USED.${END_YEAR_pism}.nc \
+	    ${COUPLE_DIR}/${PISM_HEMISPHERE}/ice_file_for_atmosphere.nc 
+	
+	
         rm $files_needed $rmlist
         echo; echo "                  ...done"
         unset files_needed

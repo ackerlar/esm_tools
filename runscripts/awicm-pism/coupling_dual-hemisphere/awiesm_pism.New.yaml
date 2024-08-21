@@ -1,0 +1,25 @@
+general:
+        iterative_coupling: True
+        use_venv: False
+        base_dir: "/work/ab0246/a270096/esm-experiments/"
+        #account: ab0246
+        ##base_dir: "/work/ba1347/a270096/esm-experiments/"
+        account: ba1347
+
+model1:
+        setup_name: awiesm
+        runscript: awiesm.yaml
+        chunk_size: 1
+        chunk_unit: "years"
+
+model2:
+        setup_name: pism_nh
+        runscript: pism_nh.yaml
+        chunk_size: 10
+        chunk_unit: "years"
+
+model3:
+        setup_name: pism_sh
+        runscript: pism_sh.yaml
+        chunk_size: 10
+        chunk_unit: "years"

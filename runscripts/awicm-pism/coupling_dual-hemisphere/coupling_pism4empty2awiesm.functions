@@ -1,5 +1,5 @@
 #!/usr/bin/ksh
-pism2awiesm() {
+pism4empty2awiesm() {
     if [ "$MACHINE" == "mistral" ]; then
         module purge
         module load defaults
@@ -31,12 +31,12 @@ pism2awiesm() {
         rm ${COUPLE_DIR}/latest_target_orography.nc
     fi
     
-    . ${FUNCTION_PATH}/coupling_pism2atmosphere.functions
-    . ${FUNCTION_PATH}/coupling_pism2ocean.functions
+    . ${FUNCTION_PATH}/coupling_pism4empty2atmosphere.functions
+    . ${FUNCTION_PATH}/coupling_pism4empty2ocean.functions
 
-    echo "*** Starting pism2atmosphere ***"
-    pism2atmosphere 2>> ${COUPLE_DIR}/cdo_stderr_pism2awiesm
+    echo "*** Starting pism4empty2atmosphere ***"
+    pism4empty2atmosphere 2>> ${COUPLE_DIR}/cdo_stderr_pism2awiesm
 
-    echo "*** Starting pism2ocean ***"
-    pism2ocean 2>> ${COUPLE_DIR}/cdo_stderr_pism2awiesm
+    echo "*** Starting pism4empty2ocean ***"
+    pism4empty2ocean 2>> ${COUPLE_DIR}/cdo_stderr_pism2awiesm
 }

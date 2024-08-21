@@ -1,8 +1,8 @@
 #!/bin/ksh
 
 
-function pism2ocean {
-    echo " *** S T A R T I N G    pism2ocean *** (PISM version ${VERSION_pism})"
+function pism4empty2ocean {
+    echo " *** S T A R T I N G    pism4empty2ocean *** (PISM version ${VERSION_pism})"
 
     . ${FUNCTION_PATH}/general_lists.functions
     . ${FUNCTION_PATH}/coupling_general.functions
@@ -19,7 +19,7 @@ function pism2ocean {
     #
     #
     # PISM OUTPUT 1a) Temporal stream for ice shelf basal melting (ymonmean/timmeam)
-    # pism2ocean  1b) Temporal stream for ice berg calving/discharging (ymonmean/timmean)
+    # pism4empty2ocean  1b) Temporal stream for ice berg calving/discharging (ymonmean/timmean)
     #             1c) Stream of vertical temperature gradient at base (last year-ymonmean/last record)
     #             1d) Stream of mask (ice-free ocean, ice shelf, land) (last record)
     #             2) Convert them into sensible units (calving: Gt < area, densities)
@@ -642,6 +642,11 @@ function iterative_coupling_pism_ocean_prepare_combine_forcings {
 	    -a coordinates,y,d,, \
 	    ${COMBINED_OUTPUT}
     fi
+
+    # CCR
+    _file1=${COMBINED_OUTPUT%%.nc}.NOT_USED.${END_YEAR_pism}.nc
+    mv ${COMBINED_OUTPUT} ${_file1}
+    cdo -mulc,0.0 ${_file1} ${COMBINED_OUTPUT} && rm ${_file1}
 
     unset cdo_task_list _file1 _file2
 }

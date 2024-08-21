@@ -11,7 +11,7 @@ prepcompute_recipe:
         - "pism_set_kv_pairs"
         - "pism_set_flags"
         - "pism_set_couplers"
-        - "pism_override_file"
+        #TODO:rename:"-pism_override_file":"-config_override"#- "pism_override_file"
         
         - "assemble"
         - "log_used_files"

@@ -1,0 +1,115 @@
+general:
+    setup_name: "awiesm"
+    # compute_time: "01:20:00"
+    compute_time: "02:20:00"    
+    initial_date: "1850-01-01T00:00:00"       # Initial exp. date
+    final_date: "1859-12-31T00:00:00"         # Final date of the experiment
+    #:org:final_date: "1853-12-31T00:00:00"         # Final date of the experiment
+    #:new0:final_date: "1859-12-31T00:00:00"         # Final date of the experiment
+    #:new1:final_date: "1869-12-31T00:00:00"         # Final date of the experiment
+    #:new2:final_date: "1879-12-31T00:00:00"         # Final date of the experiment
+    #:new3:final_date: "1881-12-31T00:00:00"         # Final date of the experiment
+    base_dir: "/work/ab0246/a270096/esm-experiments/"
+    nmonth: 0
+    nyear: 1
+    with_wiso: False
+    use_venv: False
+    #clean_old_rundirs_except: 2
+    #clean_old_rundirs_keep_every: 25
+    version: "2.1"
+    account: ab0246
+    # Why is this twice??
+    model_dir: "/home/a/a270096/awi.src/esm_tools/awiesm-2.1"
+    description: >
+      Basic AWIESM Test for PI
+    files_to_wait_for:
+        - "latest_jsbach_init_file.nc"
+        - "latest_gfw_atmo.nc"
+        - "latest_jsbach_restart_file.nc"
+        - "latest_veg_restart_file.nc"
+        - "latest_target_orography.nc"
+        - "landice_yearly_mass_loss.out"
+
+awiesm:
+    postprocessing: false
+    # Why is this twice??
+    model_dir: "/home/a/a270096/awi.src/esm_tools/awiesm-2.1"
+
+echam:
+    nproca: 48
+    nprocb: 16
+    restart_rate: 1
+    restart_unit: "years"
+    disturbance: 1.000001
+    # Set year in $base_dir/$experiment/scripts/disturb_years.dat    
+    workflow:
+            next_run_triggered_by: couple_out
+            subjobs:
+                couple_in:
+                    nproc: 1
+                    run_before: prepcompute
+                    script: coupling_dual-ice2echam.functions
+                    script_dir: "/home/a/a270096/awi.src/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere"
+                    call_function: ice2echam
+                    env_preparation: env_echam.py
+                    run_only: first_run_in_chunk
+                    skip_chunk_number: 1
+
+                couple_out:
+                    nproc: 1
+                    run_after: tidy
+                    script: coupling_echam2ice.functions
+                    script_dir: "/home/a/a270096/awi.src/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere"
+                    call_function: echam2ice
+                    env_preparation: env_echam.py
+                    run_only: last_run_in_chunk
+
+jsbach:
+    # Two-hemispheres (PISM) does not work with: dynamic_vegetations: True
+    # Two-hemispheres (PISM) initial start fails with: dynamic_vegetations: False
+    # => Start with True, submit, change to False, and hope .... (CCR)
+    # dynamic_vegetations: True  #year 1    # todo: ccr
+    # dynamic_vegetations: False #year 2-oo # todo: ccr
+    dynamic_vegetations: True
+    #dynamic_vegetations: False
+
+fesom:
+    restart_rate: 1
+    restart_unit: "y"
+    restart_first: 1
+    nproc: 384
+    namelist_dir: "/work/ba0989/a270124/direnv_test/model_codes/awiesm-2.1/fesom-2.1/config"
+    mesh_dir: "/home/a/a270064/bb1029/inputs/mesh_core2/"
+
+    add_namelist_changes:
+            namelist.config:
+                    geometry:
+                        force_rotation: True
+                    paths:
+                        climatedatapath: "/pool/data/AWICM/FESOM2/INITIAL/phc3.0/"
+                    #No:icebergs:
+                    #No:    use_icebergs: False
+                    #No:    steps_per_ib_step: 8
+                    #No:    ib_async_mode: 0
+                    #No:    #thread_support_level_required: 2
+    workflow:
+            next_run_triggered_by: couple_out
+            subjobs:
+                couple_in:
+                    nproc: 1
+                    run_before: prepcompute
+                    script: coupling_ice2fesom.functions
+                    script_dir: "/home/a/a270096/awi.src/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere"
+                    call_function: ice2fesom
+                    env_preparation: env_fesom.py
+                    run_only: first_run_in_chunk
+                    skip_chunk_number: 1
+
+                couple_out:
+                    nproc: 1
+                    run_after: tidy
+                    script: coupling_fesom2ice.functions
+                    script_dir: "/home/a/a270096/awi.src/esm_tools/runscripts/awicm-pism/coupling_dual-hemisphere"
+                    call_function: fesom2ice
+                    env_preparation: env_fesom.py
+                    run_only: last_run_in_chunk

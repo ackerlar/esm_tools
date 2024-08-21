@@ -4,9 +4,9 @@ function read_names {
         model_from=$1
         model_to=$2
         if [ -f ${COUPLE_DIR}/${model_from}_names_for_${model_to}.dat ]; then
-                namefile=${COUPLE_DIR}/${model_from}_names_for_${model_to}.dat 
+                namefile=${COUPLE_DIR}/${model_from}_names_for_${model_to}.dat
         elif [ -f ${model_from}_names_for_${model_to}.dat ]; then
-                namefile=${model_from}_names_for_${model_to}.dat 
+                namefile=${model_from}_names_for_${model_to}.dat
         else
                 echo "Could not find ${COUPLE_DIR}/${model_from}_names_for_${model_to}.dat"
                 exit 42
@@ -23,7 +23,7 @@ function test_file_or_exit {
     __error_code=$2
     if [ ! -f ${__file:-/DiesenFileNamenSeheIchSehrSelten_Oder_Fragezeichen} ] ; then
 	echo " Missing file >>${__file}<< in $(pwd)"
-	echo " S T O P  ${__error_code:-998}"
+	echo " S T O P  >>${__error_code:-Unknown Code}<<"
 	exit ${__error_code:-998}
     fi
 
@@ -35,7 +35,7 @@ function test_file_or_exit {
 # CDO (Climate Data Operator) specific functions
 #
 function build_grid_des {
-    # Build grid description file (cdo griddes) for provided 
+    # Build grid description file (cdo griddes) for provided
     # input or use existing older file if both are identical
     # Call: build_grid_des InputData, GridDesFileName (TargetDir) (RestartDir) (Var2SelectGrid)
     # Christian Rodehacke, AWI, 2018-10-15
@@ -76,7 +76,7 @@ function build_grid_des {
 
 
 function build_weights4remap {
-    # Build remapping weights (cdo griddes) for provided input 
+    # Build remapping weights (cdo griddes) for provided input
     # or use existing restart weights of it exists
     # Call: build_grid_des InputData, GridDesFileName WeightFileName RemapType (TargetDir) (RestartDir) (VariableSelection)
     # Christian Rodehacke, 2018-09-05
